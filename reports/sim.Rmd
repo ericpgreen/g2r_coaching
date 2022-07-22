@@ -40,6 +40,7 @@ The first step is to create a function to simulate data for this structure.
   library(cmdstanr)
   library(tidybayes)
   library(sjPlot)
+  library(specr)
 
   options("cmdstanr_write_stan_file_dir" = "cmdstanr")
 ```
@@ -366,6 +367,8 @@ if (action == "fit"){
       res <- broom.mixed::tidy(fit, conf.int = TRUE, conf.level = ci) %>%
         mutate(type = "raw")
       
+      x <- list(fit, res)
+      
     } else if (method == "brm") {
       
       # todo 
@@ -456,7 +459,13 @@ Next we use this function to simulate some data.
                b_spill = 0.08,
                b_host = 0.20)
 
-  m1 %>% 
-    as_tibble()
+  m1[[2]]
+```
+
+# Therapist effect
+
+```{r}
+  icc_specs(m1[[1]]) %>%
+    mutate_if(is.numeric, round, 2)
 ```
 

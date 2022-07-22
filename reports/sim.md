@@ -43,6 +43,7 @@ structure.
   library(cmdstanr)
   library(tidybayes)
   library(sjPlot)
+  library(specr)
 
   options("cmdstanr_write_stan_file_dir" = "cmdstanr")
 ```
@@ -382,6 +383,8 @@ if (action == "fit"){
       res <- broom.mixed::tidy(fit, conf.int = TRUE, conf.level = ci) %>%
         mutate(type = "raw")
       
+      x <- list(fit, res)
+      
     } else if (method == "brm") {
       
       # todo 
@@ -516,8 +519,7 @@ Next we use this function to simulate some data.
                b_spill = 0.08,
                b_host = 0.20)
 
-  m1 %>% 
-    as_tibble()
+  m1[[2]]
 ```
 
     ## # A tibble: 10 × 9
@@ -533,3 +535,16 @@ Next we use this function to simulate some data.
     ##  8 ran_pars coach    sd__…   0.243    NA         NA      NA        NA      raw  
     ##  9 ran_pars village  sd__…   0.122    NA         NA      NA        NA      raw  
     ## 10 ran_pars Residual sd__…   0.993    NA         NA      NA        NA      raw
+
+# Therapist effect
+
+``` r
+  icc_specs(m1[[1]]) %>%
+    mutate_if(is.numeric, round, 2)
+```
+
+    ##        grp vcov  icc percent
+    ## 1    group 0.09 0.08    7.85
+    ## 2    coach 0.06 0.05    5.14
+    ## 3  village 0.01 0.01    1.29
+    ## 4 Residual 0.99 0.86   85.72

@@ -16,16 +16,23 @@ following questions:
     effectiveness of coaches?
 
 These questions have clear parallels with the literature on therapist
-effects in psychotherapy research. Therapist effects are defined as,
-“the contribution that can be attributed to therapists when evaluating
-the efficacy of a psychological intervention”. Estimated by multilevel
-models, therapist effects are typically represented as a percentage of
-the outcome variability due to therapists.
+effects in psychotherapy research. Therapist effects are defined as:
 
-We are interested in conducting a secondary analysis of the Cohort 1
-data to estimate what percentage of variability in outcomes can be
-attributed to coaches. The purpose of this document is to outline an
-empirical strategy for the analysis.
+> The contribution that can be attributed to therapists when evaluating
+> the efficacy of a psychological intervention.
+
+Estimated by multilevel models, therapist effects are typically
+represented as a percentage of the outcome variability due to
+therapists. We would like to estimate the ‘coach effect’ in the G2R
+model.
+
+We propose to conduct a secondary analysis of the Cohort 1 data to
+estimate what percentage of variability in outcomes can be attributed to
+coaches. A possible limitation of this analysis is that the coach
+randomization was broken, but the extent to which AVSI had to deviate
+from the orignial assignments is not yet clear (to us at least). At a
+minimum, this analysis will generate new hypotheses about the influence
+of coaches in a setting that has very little (if any) empirical work.
 
 # Design
 
@@ -49,10 +56,11 @@ This design represents two levels of partial nesting:
 1.  Treatment households were nested in groups.
 2.  Groups were nested in coaches (also treatment only).
 
-The nesting is partial because control households did not have coaches
-or groups. Additionally, groups were nested in village clusters, but
-coaches were not. Therefore, the design has crossed random effects
-(i.e., coaches could work across villages).
+The nesting is **partial** because control households did not have
+coaches or groups. Additionally, groups were nested in village clusters
+but coaches were not (i.e., coaches could work with groups from
+different village clusters). Therefore, the design also has **crossed**
+random effects.
 
 # Data Simulation
 
@@ -107,12 +115,12 @@ since they did not have a coach.
 
 ### Actual
 
-The actual design is more complicated. Households in villages assigned
-to treatment were assigned to groups of 25, and these groups were
-assigned to 1 of 3 treatment arms or a spillover control arm.
+The actual study design was more complicated. Households in villages
+assigned to treatment were assigned to groups of 25, and these groups
+were assigned to 1 of 3 treatment arms or a spillover control arm.
 
-IPA ran the following model (coefficient names changed to match this
-simulation):
+IPA estimated the following model (coefficient names changed to match
+this simulation):
 
 ![](empirical.png)<!-- -->
 
@@ -145,6 +153,9 @@ setting as a fixed effect:
                                     #   but arms 1 and 3 had group program elements
 
 ## Function
+
+We start by defining a function that simulates the data and fits the
+model.
 
 ``` r
 #' Simulate data
@@ -427,7 +438,7 @@ if (action == "fit"){
 
 ## Design Checks
 
-Next we use this function to simulate some data.
+Next we use this function to simulate some data and run a few checks.
 
 ``` r
   df <- simfit(seed = 8675309, 
@@ -528,6 +539,10 @@ Next we use this function to simulate some data.
 # Proposed Analysis
 
 ## Model
+
+For this example, we pulled Cohort 1 endline results for the food
+security outcome and made up random effects for villages, coaches, and
+groups.
 
 ``` r
   m1 <- simfit(seed = 8675309, 
@@ -868,3 +883,10 @@ the effect of trt for each coach.
 ```
 
 ![](sim_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+# To Do
+
+-   Determine the extent to which coach randomization was broken
+-   Incorporate baseline data into the model.
+-   Set up an analysis to estimate how coach effects vary by
+    pre-treatment severity.

@@ -767,6 +767,11 @@ Marginal R<sup>2</sup> / Conditional R<sup>2</sup>
 </tr>
 </table>
 
+\[The N’s for coaches and groups do not represent the actual number of
+coaches and groups. This is because pure control and spillover control
+households have singleton clusters for coaches and groups, inflating the
+overall count.\]
+
 ## Coach effect (Activity 1.1)
 
 In the psychotherapy literature, therapist effects typically explain 5
@@ -829,7 +834,10 @@ package to calculate the group-level effects for coaches.
 
 Given the original model has `(0 + trt | coach)`, which is how I said
 coaches are only in treatment arms 1-3, I think what we get for coach is
-the effect of trt for each coach.
+the effect of trt for each coach. Specifically, these are deviations
+from the effect of the intervention on food security. Coefficients close
+to 0 indicate that the coach’s effect is close to the population-level
+effect.
 
 ``` r
   c_include <- df %>% 

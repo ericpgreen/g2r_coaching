@@ -11,6 +11,18 @@ output: github_document
 
 # Introduction
 
+AVSI is interested in further exploring why coaching matters and how coaches make a difference in the lives of program participants. AVSI's key learning objective with respect to coaching is to answer the following questions:
+
+1. In what ways is coaching important for achieving the goals of G2R?
+2. What are the characteristics and practices of highly effective coaches?
+3. What is the role of training, supervision, and support in the coaching model, and how can the program improve the capacity and effectiveness of coaches?
+
+These questions have clear parallels with the literature on therapist effects in psychotherapy research. Therapist effects are defined as, "the contribution that can be attributed to therapists when evaluating the efficacy of a psychological intervention". Estimated by multilevel models, therapist effects are typically represented as a percentage of the outcome variability due to therapists. 
+
+We are interested in conducting a secondary analysis of the Cohort 1 data to estimate what percentage of variability in outcomes can be attributed to coaches. The purpose of this document is to outline an empirical strategy for the analysis.
+
+# Design
+
 In Cohort 1, village clusters were randomly assigned to treatment or control in each strata (host and refugee communities). Eligible households in each treatment village were then randomly assigned to groups of 25 households, and these groups were randomly assigned to 1 of 4 unmarked bins. A public lottery was held to assign bins to study arms. 
 
 Separately, coaches were randomly assigned to be individual or group coaches. Individual coaches were randomly assigned to a group of 25 households in study arms 1 or 3 (individual coaching), whereas group coaches were each randomly assigned to 5 groups of 25 households in study arm 2 (group coaching). The households assigned to arm 4 were in the spillover control and did not receive the program.
@@ -26,9 +38,9 @@ This design represents two levels of partial nesting:
 
 The nesting is partial because control households did not have coaches or groups. Additionally, groups were nested in village clusters, but coaches were not. Therefore, the design has crossed random effects (i.e., coaches could work across villages).
 
-# Function to simulate data
+# Data Simulation
 
-The first step is to create a function to simulate data for this structure. 
+We do not have access to the data, so to illustrate a proposed approach we must first simulate trial data. 
 
 ```{r packages}
 # load the necessary packages
@@ -41,6 +53,8 @@ The first step is to create a function to simulate data for this structure.
   library(tidybayes)
   library(sjPlot)
   library(specr)
+  library(patchwork)
+  library(modelbased)
 
   options("cmdstanr_write_stan_file_dir" = "cmdstanr")
 ```
@@ -79,13 +93,13 @@ IPA ran the following model (coefficient names changed to match this simulation)
 
 A few things to note about the IPA strategy:
 
-1. They entered village as a fixed effect
-2. They account for the multilevel nature of the design with bootstrapping.
-3. They do not include setting (host/refugee) in the model.
+1. They entered village as a fixed effect, not a random effect.
+2. They accounted for the multilevel nature of the design with bootstrapping.
+3. They did not include setting (host/refugee) in the model.
 
 > To account for the two levels of randomization — village level randomization into treatment and control and household-level randomization into experimental arms within treatment villages — we construct standard errors of the parameter estimates of interest by using a bootstrap procedure that mirrors the two stages randomization process at the two different levels.
 
-For this exercise we'll fit a mixed model and incorporate information about setting as a fixed effect:
+We propose to fit a mixed model and incorporate information about setting as a fixed effect:
 
 ```
 lmer(y ~ coaching_individual +  # assigned to arm 1
@@ -437,7 +451,9 @@ Next we use this function to simulate some data.
     as_tibble()
 ```
 
-# Simulate and fit
+# Proposed Analysis
+
+## Model
 
 ```{r, message=FALSE}
   m1 <- simfit(seed = 8675309, 
@@ -462,10 +478,76 @@ Next we use this function to simulate some data.
   m1[[2]]
 ```
 
-# Therapist effect
+## Coach effect (Activity 1.1)
+
+In the psychotherapy literature, therapist effects typically explain 5 to 8% of the variance in client outcomes. This effect can be smaller when therapist training and certification is robust and when the intervention being delivered is manualized—both factors standardize aspects of the therapeutic experience, thus reducing variability due to therapists. However, research also suggests that therapist effects may be strongest for the most severe cases.
+
+We will define the coach effect as the coach-level ICC. 
 
 ```{r}
   icc_specs(m1[[1]]) %>%
     mutate_if(is.numeric, round, 2)
+```
+
+## Descriptive exploration of coaching variability (Activity 1.2)
+
+We will use coach-level estimates from the multilevel model to describe and visualize coaching variability. One way to do this is to use the [`modelbased`](https://easystats.github.io/modelbased/articles/estimate_grouplevel.html) package to calculate the group-level effects for coaches.
+
+```{r}
+  m1_coach <- estimate_grouplevel(m1[[1]])
+  m1_coach %>% as_tibble %>% arrange(desc(Coefficient)) %>%print(n=20)
+```
+
+Given the original model has `(0 + trt | coach)`, which is how I said coaches are only in treatment arms 1-3, I think what we get for coach is the effect of trt for each coach.
+
+```{r}
+  c_include <- df %>% 
+    filter(trt==1) %>% 
+    distinct(coach) %>% 
+    pull(coach)
+  
+  coach_setting <- df %>%
+    distinct(coach, .keep_all = TRUE) %>%
+    select(coach, host) %>%
+    rename(Level = coach) %>%
+    mutate(host = factor(host, 
+                         levels = c(0, 1),
+                         labels = c("Refugee", "Host")))
+  
+  m1_coach_r_p <- m1_coach %>% 
+    filter(Group == "coach") %>%
+    filter(Level %in% c_include) %>%
+    left_join(coach_setting) %>%
+    filter(host == "Refugee") %>%
+    mutate(Level = fct_reorder(Level, Coefficient)) %>%
+    visualisation_recipe(., point = list(size = .1)) %>%
+    plot() +
+      theme_minimal() +
+      labs(x = NULL,
+           title = "Refugee Community Coaches") +
+      theme(axis.text.y = element_blank()) +
+      ylim(-1, 1)
+  
+  m1_coach_h_p <- m1_coach %>% 
+    filter(Group == "coach") %>%
+    filter(Level %in% c_include) %>%
+    left_join(coach_setting) %>%
+    filter(host == "Host") %>%
+    mutate(Level = fct_reorder(Level, Coefficient)) %>%
+    visualisation_recipe(., point = list(size = .1)) %>%
+    plot() +
+      theme_minimal() +
+      labs(x = NULL,
+           title = "Host Community Coaches") +
+      theme(axis.text.y = element_blank()) +
+      ylim(-1, 1)
+  
+  m1_coach_h_p + m1_coach_r_p + 
+    plot_annotation(
+    title = 'Coach deviations from the effect of the intervention on food security',
+    subtitle = "Coefficients close to 0 indicate that the coach's effect is close to the population-level effect",
+    caption = 'Adjusted for arm and setting.',
+    theme = theme(plot.title = element_text(face = "bold",
+                                            size=18)))
 ```
 

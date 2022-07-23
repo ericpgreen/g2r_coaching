@@ -2,3 +2,4 @@
 /scripts
 /reports/sim_cache
 *.Rproj.user
+.Rproj.user

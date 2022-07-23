@@ -3,6 +3,32 @@ Coach Effect Simulation
 
 # Introduction
 
+AVSI is interested in further exploring why coaching matters and how
+coaches make a difference in the lives of program participants. AVSI’s
+key learning objective with respect to coaching is to answer the
+following questions:
+
+1.  In what ways is coaching important for achieving the goals of G2R?
+2.  What are the characteristics and practices of highly effective
+    coaches?
+3.  What is the role of training, supervision, and support in the
+    coaching model, and how can the program improve the capacity and
+    effectiveness of coaches?
+
+These questions have clear parallels with the literature on therapist
+effects in psychotherapy research. Therapist effects are defined as,
+“the contribution that can be attributed to therapists when evaluating
+the efficacy of a psychological intervention”. Estimated by multilevel
+models, therapist effects are typically represented as a percentage of
+the outcome variability due to therapists.
+
+We are interested in conducting a secondary analysis of the Cohort 1
+data to estimate what percentage of variability in outcomes can be
+attributed to coaches. The purpose of this document is to outline an
+empirical strategy for the analysis.
+
+# Design
+
 In Cohort 1, village clusters were randomly assigned to treatment or
 control in each strata (host and refugee communities). Eligible
 households in each treatment village were then randomly assigned to
@@ -28,10 +54,10 @@ or groups. Additionally, groups were nested in village clusters, but
 coaches were not. Therefore, the design has crossed random effects
 (i.e., coaches could work across villages).
 
-# Function to simulate data
+# Data Simulation
 
-The first step is to create a function to simulate data for this
-structure.
+We do not have access to the data, so to illustrate a proposed approach
+we must first simulate trial data.
 
 ``` r
 # load the necessary packages
@@ -44,6 +70,8 @@ structure.
   library(tidybayes)
   library(sjPlot)
   library(specr)
+  library(patchwork)
+  library(modelbased)
 
   options("cmdstanr_write_stan_file_dir" = "cmdstanr")
 ```
@@ -90,10 +118,10 @@ simulation):
 
 A few things to note about the IPA strategy:
 
-1.  They entered village as a fixed effect
-2.  They account for the multilevel nature of the design with
+1.  They entered village as a fixed effect, not a random effect.
+2.  They accounted for the multilevel nature of the design with
     bootstrapping.
-3.  They do not include setting (host/refugee) in the model.
+3.  They did not include setting (host/refugee) in the model.
 
 > To account for the two levels of randomization — village level
 > randomization into treatment and control and household-level
@@ -102,8 +130,8 @@ A few things to note about the IPA strategy:
 > using a bootstrap procedure that mirrors the two stages randomization
 > process at the two different levels.
 
-For this exercise we’ll fit a mixed model and incorporate information
-about setting as a fixed effect:
+We propose to fit a mixed model and incorporate information about
+setting as a fixed effect:
 
     lmer(y ~ coaching_individual +  # assigned to arm 1
              coaching_group +       # assigned to arm 2
@@ -497,7 +525,9 @@ Next we use this function to simulate some data.
     ## 2 group coaching with asset            28
     ## 3 individual coaching without asset    85
 
-# Simulate and fit
+# Proposed Analysis
+
+## Model
 
 ``` r
   m1 <- simfit(seed = 8675309, 
@@ -536,7 +566,17 @@ Next we use this function to simulate some data.
     ##  9 ran_pars village  sd__…   0.122    NA         NA      NA        NA      raw  
     ## 10 ran_pars Residual sd__…   0.993    NA         NA      NA        NA      raw
 
-# Therapist effect
+## Coach effect (Activity 1.1)
+
+In the psychotherapy literature, therapist effects typically explain 5
+to 8% of the variance in client outcomes. This effect can be smaller
+when therapist training and certification is robust and when the
+intervention being delivered is manualized—both factors standardize
+aspects of the therapeutic experience, thus reducing variability due to
+therapists. However, research also suggests that therapist effects may
+be strongest for the most severe cases.
+
+We will define the coach effect as the coach-level ICC.
 
 ``` r
   icc_specs(m1[[1]]) %>%
@@ -548,3 +588,97 @@ Next we use this function to simulate some data.
     ## 2    coach 0.06 0.05    5.14
     ## 3  village 0.01 0.01    1.29
     ## 4 Residual 0.99 0.86   85.72
+
+## Descriptive exploration of coaching variability (Activity 1.2)
+
+We will use coach-level estimates from the multilevel model to describe
+and visualize coaching variability. One way to do this is to use the
+[`modelbased`](https://easystats.github.io/modelbased/articles/estimate_grouplevel.html)
+package to calculate the group-level effects for coaches.
+
+``` r
+  m1_coach <- estimate_grouplevel(m1[[1]])
+  m1_coach %>% as_tibble %>% arrange(desc(Coefficient)) %>%print(n=20)
+```
+
+    ## # A tibble: 9,477 × 8
+    ##    Group Level  Parameter Coefficient    SE    CI    CI_low CI_high
+    ##    <chr> <chr>  <chr>           <dbl> <dbl> <dbl>     <dbl>   <dbl>
+    ##  1 coach c_55   trt             0.673 0.170  0.95  0.340      1.01 
+    ##  2 group g_43   trt             0.575 0.201  0.95  0.180      0.970
+    ##  3 group g_69   trt             0.551 0.201  0.95  0.156      0.946
+    ##  4 group g_57   trt             0.521 0.201  0.95  0.127      0.916
+    ##  5 group g_4    trt             0.481 0.222  0.95  0.0447     0.916
+    ##  6 group g_81   trt             0.466 0.201  0.95  0.0710     0.861
+    ##  7 group g_103  trt             0.450 0.222  0.95  0.0141     0.886
+    ##  8 group g_123  trt             0.449 0.222  0.95  0.0135     0.885
+    ##  9 group g_1207 trt             0.418 0.222  0.95 -0.0178     0.854
+    ## 10 group g_1228 trt             0.394 0.201  0.95 -0.000324   0.789
+    ## 11 group g_1232 trt             0.361 0.201  0.95 -0.0336     0.755
+    ## 12 group g_125  trt             0.350 0.222  0.95 -0.0859     0.786
+    ## 13 group g_114  trt             0.328 0.222  0.95 -0.108      0.764
+    ## 14 group g_79   trt             0.328 0.201  0.95 -0.0673     0.722
+    ## 15 coach c_4    trt             0.314 0.204  0.95 -0.0854     0.714
+    ## 16 group g_1296 trt             0.314 0.222  0.95 -0.122      0.750
+    ## 17 group g_1198 trt             0.304 0.222  0.95 -0.132      0.740
+    ## 18 group g_1252 trt             0.303 0.201  0.95 -0.0913     0.698
+    ## 19 group g_1208 trt             0.300 0.222  0.95 -0.136      0.736
+    ## 20 group g_66   trt             0.300 0.201  0.95 -0.0952     0.694
+    ## # … with 9,457 more rows
+
+Given the original model has `(0 + trt | coach)`, which is how I said
+coaches are only in treatment arms 1-3, I think what we get for coach is
+the effect of trt for each coach.
+
+``` r
+  c_include <- df %>% 
+    filter(trt==1) %>% 
+    distinct(coach) %>% 
+    pull(coach)
+  
+  coach_setting <- df %>%
+    distinct(coach, .keep_all = TRUE) %>%
+    select(coach, host) %>%
+    rename(Level = coach) %>%
+    mutate(host = factor(host, 
+                         levels = c(0, 1),
+                         labels = c("Refugee", "Host")))
+  
+  m1_coach_r_p <- m1_coach %>% 
+    filter(Group == "coach") %>%
+    filter(Level %in% c_include) %>%
+    left_join(coach_setting) %>%
+    filter(host == "Refugee") %>%
+    mutate(Level = fct_reorder(Level, Coefficient)) %>%
+    visualisation_recipe(., point = list(size = .1)) %>%
+    plot() +
+      theme_minimal() +
+      labs(x = NULL,
+           title = "Refugee Community Coaches") +
+      theme(axis.text.y = element_blank()) +
+      ylim(-1, 1)
+  
+  m1_coach_h_p <- m1_coach %>% 
+    filter(Group == "coach") %>%
+    filter(Level %in% c_include) %>%
+    left_join(coach_setting) %>%
+    filter(host == "Host") %>%
+    mutate(Level = fct_reorder(Level, Coefficient)) %>%
+    visualisation_recipe(., point = list(size = .1)) %>%
+    plot() +
+      theme_minimal() +
+      labs(x = NULL,
+           title = "Host Community Coaches") +
+      theme(axis.text.y = element_blank()) +
+      ylim(-1, 1)
+  
+  m1_coach_h_p + m1_coach_r_p + 
+    plot_annotation(
+    title = 'Coach deviations from the effect of the intervention on food security',
+    subtitle = "Coefficients close to 0 indicate that the coach's effect is close to the population-level effect",
+    caption = 'Adjusted for arm and setting.',
+    theme = theme(plot.title = element_text(face = "bold",
+                                            size=18)))
+```
+
+![](sim_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->

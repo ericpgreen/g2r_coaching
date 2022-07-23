@@ -475,7 +475,7 @@ Next we use this function to simulate some data.
                b_spill = 0.08,
                b_host = 0.20)
 
-  m1[[2]]
+  tab_model(m1[[1]])
 ```
 
 ## Coach effect (Activity 1.1)

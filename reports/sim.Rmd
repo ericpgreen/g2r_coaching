@@ -134,9 +134,9 @@ We start by defining a function that simulates the data and fits the model.
 #' @param k_villages number of villages
 #' @param village_rho village ICC
 #' @param coach_rho coach ICC
-#' @param group_rho group ICC
+#' @param coach_group_rho ICC for same coach & group; since groups are nested in coaches, the ICC for group (coach_group_rho) is the ICC for observations sharing the same coach and the same group, so must be equal to or greater than the ICC for coach alone (coach_rho)
+#' @param variance_total_trt total variance
 #' @param b_0 mean in pure control
-#' @param sd standard deviation in pure control
 #' @param b_ind_asset impact of individual coaching with asset transfer
 #' @param b_group impact of group coaching with asset transfer
 #' @param b_ind_noasset impact of individual coaching without asset transfer
@@ -153,9 +153,9 @@ We start by defining a function that simulates the data and fits the model.
                      n_group,
                      village_rho, 
                      coach_rho,
-                     group_rho,
+                     coach_group_rho,
+                     variance_total_trt,
                      b_0,
-                     sd,
                      b_ind_asset,
                      b_group,
                      b_ind_noasset,
@@ -183,7 +183,7 @@ We start by defining a function that simulates the data and fits the model.
   village <- paste("v", c(villages_t1, villages_t0), sep="_")
   
 # group indicator for treatment villages, singleton groups in control villages
-# need to add singleton groups for spillover control hhs
+# need to add singleton groups for spillover control hhs in later step
   group <- paste("g",
                  c(rep(1:((k_villages/2)*group_village_t1), each = n_group),
                    (n1+1):(n1+n0)),
@@ -271,7 +271,7 @@ We start by defining a function that simulates the data and fits the model.
       TRUE ~ NA_character_)
     )
   
-  # some coaches need to have extra groups
+# some coaches need to have extra groups
   n_coaches_arm2 <- ((length(unique(df$group[df$arm==2])))%/%3)
   n_left_over_groups_arm2 <- ((length(unique(df$group[df$arm==2])))%%3)
   coaches_id_arm2 <- unique(rep(1:((length(unique(df$group[df$arm==2])))%/%3),
@@ -334,23 +334,41 @@ We start by defining a function that simulates the data and fits the model.
     left_join(strata) 
   
 # add random effects
+#############################################################################
+# Calculate variance for each random effect from input ICC. Setting total 
+# variance to 1 in treatment arms for simplicity, so ICC for each random 
+# effect will be equal to its variance (e.g. coach_rho = variance_coach /
+# variance_total_trt = variance_coach). Note that since groups are nested 
+# in coaches, the ICC for group (coach_group_rho) is the ICC for observations 
+# sharing the same coach and the same group, so must be equal to or greater 
+# than the ICC for coach alone (coach_rho). If the 0.10 value was intended to
+# be for group beyond the ICC of 0.06 for coach, coach_group_rho should be set
+# to 0.16.
+#############################################################################
+
+  variance_village <- village_rho * variance_total_trt
+  variance_coach <- coach_rho * variance_total_trt
+  variance_group <- (coach_group_rho - coach_rho) * variance_total_trt
+  variance_residual <- variance_total_trt - variance_village - variance_coach -                              variance_group
+  variance_total_no_trt <- variance_village + variance_residual # not used
+
   df <- df %>%
     arrange(village, group, id) %>%
   # village
     group_by(village) %>%
-    mutate(village_variation = rep(rnorm(1,  sd = sqrt(village_rho)),
+    mutate(village_variation = rep(rnorm(1,  sd = sqrt(variance_village)),
                                    each = n())) %>%
   # coach
     group_by(coach) %>%
-    mutate(coach_variation = rep(rnorm(1, sd = sqrt(coach_rho)),
+    mutate(coach_variation = rep(rnorm(1, sd = sqrt(variance_coach)),
                                    each = n())) %>%
   # group
     group_by(group) %>%
-    mutate(group_variation = rep(rnorm(1, sd = sqrt(group_rho)),
+    mutate(group_variation = rep(rnorm(1, sd = sqrt(variance_group)),
                                  each = n())) %>%
   # residual variation
     ungroup() %>%
-    mutate(sigma = rnorm(n(), mean = 0, sd = sd)) %>%
+    mutate(sigma = rnorm(n(), mean = 0, sd = sqrt(variance_residual))) %>%
   # simulated outcome data
     mutate(y = b_0 +
                b_ind_asset*coaching_individual +
@@ -413,9 +431,9 @@ Next we use this function to simulate some data and run a few checks.
                n_group = 25,
                village_rho = 0.02,
                coach_rho = 0.06,
-               group_rho = 0.10,
-               b_0 = 0,             # mean pure control
-               sd = 1,              # sd pure control
+               coach_group_rho = 0.16, # ICC for same coach & group
+               variance_total_trt = 1,
+               b_0 = 0,                # mean pure control
                b_ind_asset = 0.63,
                b_group = 0.63,
                b_ind_noasset = 0.51,
@@ -456,6 +474,17 @@ Next we use this function to simulate some data and run a few checks.
     count() %>%
     as_tibble()
 ```
+Check of the degree to which village and coach are crossed. Need to compare to real data to see how realistic this is.
+
+```{r}
+  df %>% 
+    filter(trt == 1) %>%
+    distinct(coach, village, .keep_all = TRUE) %>%
+    group_by(coach, host) %>%
+    count(name = "number_of_villages") %>%
+    group_by(number_of_villages, host) %>%
+    count()
+```
 
 # Proposed Analysis
 
@@ -474,9 +503,9 @@ For this example, we pulled Cohort 1 endline results for the food security outco
                n_group = 25,
                village_rho = 0.02,
                coach_rho = 0.06,
-               group_rho = 0.10,
-               b_0 = 0,             # mean pure control
-               sd = 1,              # sd pure control
+               coach_group_rho = 0.16, # ICC for same coach & group
+               variance_total_trt = 1,
+               b_0 = 0,                # mean pure control
                b_ind_asset = 0.63,
                b_group = 0.63,
                b_ind_noasset = 0.51,
@@ -499,16 +528,19 @@ We will define the coach effect as the coach-level ICC.
     mutate_if(is.numeric, round, 2)
 ```
 
+Note that ICC for `group` as calculated by this function represents only the variation explained by `group` *beyond the variation explained by `coach`*. Since group is nested in coach, the ICC for observations in the same group is actually the sum of the values for group and coach in this table.
+
 ## Descriptive exploration of coaching variability (Activity 1.2)
 
 We will use coach-level estimates from the multilevel model to describe and visualize coaching variability. One way to do this is to use the [`modelbased`](https://easystats.github.io/modelbased/articles/estimate_grouplevel.html) package to calculate the group-level effects for coaches.
 
 ```{r}
+# https://easystats.github.io/modelbased/reference/estimate_grouplevel.html
   m1_coach <- estimate_grouplevel(m1[[1]])
   m1_coach %>% as_tibble %>% arrange(desc(Coefficient)) %>%print(n=20)
 ```
 
-Given the original model has `(0 + trt | coach)`, which is how I said coaches are only in treatment arms 1-3, I think what we get for coach is the effect of trt for each coach. Specifically, these are deviations from the effect of the intervention on food security. Coefficients close to 0 indicate that the coach's effect is close to the population-level effect. 
+These are deviations from the effect of the intervention (`trt==1`) on food security. Coefficients close to 0 indicate that the coach's effect is close to the population-level effect. 
 
 ```{r}
   c_include <- df %>% 
@@ -561,8 +593,86 @@ Given the original model has `(0 + trt | coach)`, which is how I said coaches ar
                                             size=18)))
 ```
 
+
+I believe this is equivalent to `trt` below:
+
+```{r}
+  coach <- coef(m1[[1]])$coach
+  coach_re <- coach %>%
+    mutate(coach = row.names(coach)) %>%
+    select(coach, trt, "(Intercept)") %>%
+    filter(coach %in% c_include) %>%
+    left_join(coach_setting, by = c("coach" = "Level")) 
+```
+
+We can use this to identify the most and least effective coaches and then qualitatively explore their records to generate some hypotheses about why some coaches appear to have more impact on participants than others.
+
+For instance, we could identify the coaches in each setting who are +/- 1 SD away from the population-level effect.
+
+```{r}
+  coach_re_sd <- coach_re %>%
+    group_by(host) %>%
+    mutate(trt_z = scale(trt)) %>%
+    ungroup() %>%
+    mutate(trt_top = case_when(
+      trt_z >= 1 ~ 1,
+      TRUE ~ 0
+    )) %>%
+    mutate(trt_bottom = case_when(
+      trt_z <= -1 ~ 1,
+      TRUE ~ 0
+    ))
+    
+  coach_re_sd %>% 
+    group_by(host) %>% 
+    summarize(top = sum(trt_top), 
+              bottom = sum(trt_bottom))
+  
+  coach_re_sd %>%
+    filter(trt_top == 1) 
+  
+  coach_re_sd %>%
+    filter(trt_bottom == 1) 
+```
+
+We could then look qualitatively at each top/bottom coach's case records to generate ideas about what makes someone a top or bottom coach.
+
+In addition, we could incorporate an indicator for being a top coach into the model and estimate the impact of having a top coach. [Coaches were randomized to groups, but this randomization was broken to some extent.] 
+
+```{r}
+  df <- df %>%
+    left_join(select(coach_re_sd, coach, trt_top, trt_bottom)) %>%
+    mutate(trt_top = case_when(
+      is.na(trt_top) ~ 0,
+      TRUE ~ trt_top
+    )) %>%
+    mutate(trt_bottom = case_when(
+        is.na(trt_bottom) ~ 0,
+        TRUE ~ trt_bottom
+      ))
+  
+  m1_top <- lmer(y ~ trt_top +
+                     coaching_group + 
+                     coaching_individual + 
+                     no_asset + 
+                     host + 
+                     (1 | village) + 
+                     (0 + trt | coach) + 
+                     (0 + trt | group), 
+                data=df %>% mutate(trt_top = factor(trt_top)))
+  
+  tab_model(m1_top)
+  
+  plot_model(m1_top)
+  
+  m1_top_p <- ggeffects::ggpredict(m1_top, "trt_top")
+  m1_top_p
+  plot(m1_top_p)
+```
+
+
 # To Do
 
 * Determine the extent to which coach randomization was broken
-* Incorporate baseline data into the model.
-* Set up an analysis to estimate how coach effects vary by pre-treatment severity.
+* Incorporate baseline data into the model
+* Set up an analysis to estimate how coach effects vary by pre-treatment severity

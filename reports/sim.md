@@ -169,9 +169,9 @@ model.
 #' @param k_villages number of villages
 #' @param village_rho village ICC
 #' @param coach_rho coach ICC
-#' @param group_rho group ICC
+#' @param coach_group_rho ICC for same coach & group; since groups are nested in coaches, the ICC for group (coach_group_rho) is the ICC for observations sharing the same coach and the same group, so must be equal to or greater than the ICC for coach alone (coach_rho)
+#' @param variance_total_trt total variance
 #' @param b_0 mean in pure control
-#' @param sd standard deviation in pure control
 #' @param b_ind_asset impact of individual coaching with asset transfer
 #' @param b_group impact of group coaching with asset transfer
 #' @param b_ind_noasset impact of individual coaching without asset transfer
@@ -188,9 +188,9 @@ model.
                      n_group,
                      village_rho, 
                      coach_rho,
-                     group_rho,
+                     coach_group_rho,
+                     variance_total_trt,
                      b_0,
-                     sd,
                      b_ind_asset,
                      b_group,
                      b_ind_noasset,
@@ -218,7 +218,7 @@ model.
   village <- paste("v", c(villages_t1, villages_t0), sep="_")
   
 # group indicator for treatment villages, singleton groups in control villages
-# need to add singleton groups for spillover control hhs
+# need to add singleton groups for spillover control hhs in later step
   group <- paste("g",
                  c(rep(1:((k_villages/2)*group_village_t1), each = n_group),
                    (n1+1):(n1+n0)),
@@ -306,7 +306,7 @@ model.
       TRUE ~ NA_character_)
     )
   
-  # some coaches need to have extra groups
+# some coaches need to have extra groups
   n_coaches_arm2 <- ((length(unique(df$group[df$arm==2])))%/%3)
   n_left_over_groups_arm2 <- ((length(unique(df$group[df$arm==2])))%%3)
   coaches_id_arm2 <- unique(rep(1:((length(unique(df$group[df$arm==2])))%/%3),
@@ -369,23 +369,41 @@ model.
     left_join(strata) 
   
 # add random effects
+#############################################################################
+# Calculate variance for each random effect from input ICC. Setting total 
+# variance to 1 in treatment arms for simplicity, so ICC for each random 
+# effect will be equal to its variance (e.g. coach_rho = variance_coach /
+# variance_total_trt = variance_coach). Note that since groups are nested 
+# in coaches, the ICC for group (coach_group_rho) is the ICC for observations 
+# sharing the same coach and the same group, so must be equal to or greater 
+# than the ICC for coach alone (coach_rho). If the 0.10 value was intended to
+# be for group beyond the ICC of 0.06 for coach, coach_group_rho should be set
+# to 0.16.
+#############################################################################
+
+  variance_village <- village_rho * variance_total_trt
+  variance_coach <- coach_rho * variance_total_trt
+  variance_group <- (coach_group_rho - coach_rho) * variance_total_trt
+  variance_residual <- variance_total_trt - variance_village - variance_coach -                              variance_group
+  variance_total_no_trt <- variance_village + variance_residual # not used
+
   df <- df %>%
     arrange(village, group, id) %>%
   # village
     group_by(village) %>%
-    mutate(village_variation = rep(rnorm(1,  sd = sqrt(village_rho)),
+    mutate(village_variation = rep(rnorm(1,  sd = sqrt(variance_village)),
                                    each = n())) %>%
   # coach
     group_by(coach) %>%
-    mutate(coach_variation = rep(rnorm(1, sd = sqrt(coach_rho)),
+    mutate(coach_variation = rep(rnorm(1, sd = sqrt(variance_coach)),
                                    each = n())) %>%
   # group
     group_by(group) %>%
-    mutate(group_variation = rep(rnorm(1, sd = sqrt(group_rho)),
+    mutate(group_variation = rep(rnorm(1, sd = sqrt(variance_group)),
                                  each = n())) %>%
   # residual variation
     ungroup() %>%
-    mutate(sigma = rnorm(n(), mean = 0, sd = sd)) %>%
+    mutate(sigma = rnorm(n(), mean = 0, sd = sqrt(variance_residual))) %>%
   # simulated outcome data
     mutate(y = b_0 +
                b_ind_asset*coaching_individual +
@@ -448,9 +466,9 @@ Next we use this function to simulate some data and run a few checks.
                n_group = 25,
                village_rho = 0.02,
                coach_rho = 0.06,
-               group_rho = 0.10,
-               b_0 = 0,             # mean pure control
-               sd = 1,              # sd pure control
+               coach_group_rho = 0.16, # ICC for same coach & group
+               variance_total_trt = 1,
+               b_0 = 0,                # mean pure control
                b_ind_asset = 0.63,
                b_group = 0.63,
                b_ind_noasset = 0.51,
@@ -464,24 +482,24 @@ Next we use this function to simulate some data and run a few checks.
 ```
 
     ## # A tibble: 10,830 × 7
-    ##       id village village_trt  host   arm coach       y
-    ##    <int> <chr>         <dbl> <dbl> <dbl> <chr>   <dbl>
-    ##  1     1 v_1               1     1     1 c_1   -0.774 
-    ##  2     2 v_1               1     1     1 c_1    1.18  
-    ##  3     3 v_1               1     1     1 c_1    1.27  
-    ##  4     4 v_1               1     1     1 c_1    0.140 
-    ##  5     5 v_1               1     1     1 c_1    1.83  
-    ##  6     6 v_1               1     1     1 c_1   -0.569 
-    ##  7     7 v_1               1     1     1 c_1   -0.0722
-    ##  8     8 v_1               1     1     1 c_1    0.833 
-    ##  9     9 v_1               1     1     1 c_1    3.05  
-    ## 10    10 v_1               1     1     1 c_1    0.0581
-    ## 11    11 v_1               1     1     1 c_1    2.31  
-    ## 12    12 v_1               1     1     1 c_1    0.313 
-    ## 13    13 v_1               1     1     1 c_1    1.35  
-    ## 14    14 v_1               1     1     1 c_1    0.173 
-    ## 15    15 v_1               1     1     1 c_1   -0.396 
-    ## 16    16 v_1               1     1     1 c_1   -0.119 
+    ##       id village village_trt  host   arm coach        y
+    ##    <int> <chr>         <dbl> <dbl> <dbl> <chr>    <dbl>
+    ##  1     1 v_1               1     1     1 c_1   -0.632  
+    ##  2     2 v_1               1     1     1 c_1    1.14   
+    ##  3     3 v_1               1     1     1 c_1    1.22   
+    ##  4     4 v_1               1     1     1 c_1    0.196  
+    ##  5     5 v_1               1     1     1 c_1    1.72   
+    ##  6     6 v_1               1     1     1 c_1   -0.446  
+    ##  7     7 v_1               1     1     1 c_1    0.00377
+    ##  8     8 v_1               1     1     1 c_1    0.824  
+    ##  9     9 v_1               1     1     1 c_1    2.83   
+    ## 10    10 v_1               1     1     1 c_1    0.122  
+    ## 11    11 v_1               1     1     1 c_1    2.16   
+    ## 12    12 v_1               1     1     1 c_1    0.353  
+    ## 13    13 v_1               1     1     1 c_1    1.29   
+    ## 14    14 v_1               1     1     1 c_1    0.226  
+    ## 15    15 v_1               1     1     1 c_1   -0.290  
+    ## 16    16 v_1               1     1     1 c_1   -0.0390 
     ## # … with 10,814 more rows
 
 ``` r
@@ -536,6 +554,27 @@ Next we use this function to simulate some data and run a few checks.
     ## 2 group coaching with asset            28
     ## 3 individual coaching without asset    85
 
+Check of the degree to which village and coach are crossed. Need to
+compare to real data to see how realistic this is.
+
+``` r
+  df %>% 
+    filter(trt == 1) %>%
+    distinct(coach, village, .keep_all = TRUE) %>%
+    group_by(coach, host) %>%
+    count(name = "number_of_villages") %>%
+    group_by(number_of_villages, host) %>%
+    count()
+```
+
+    ## # A tibble: 3 × 3
+    ## # Groups:   number_of_villages, host [3]
+    ##   number_of_villages  host     n
+    ##                <int> <dbl> <int>
+    ## 1                  1     0    93
+    ## 2                  1     1    98
+    ## 3                  2     0     7
+
 # Proposed Analysis
 
 ## Model
@@ -555,9 +594,9 @@ groups.
                n_group = 25,
                village_rho = 0.02,
                coach_rho = 0.06,
-               group_rho = 0.10,
-               b_0 = 0,             # mean pure control
-               sd = 1,              # sd pure control
+               coach_group_rho = 0.16, # ICC for same coach & group
+               variance_total_trt = 1,
+               b_0 = 0,                # mean pure control
                b_ind_asset = 0.63,
                b_group = 0.63,
                b_ind_noasset = 0.51,
@@ -601,7 +640,7 @@ p
 -0.09 – 0.03
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.327
+0.351
 </td>
 </tr>
 <tr>
@@ -612,7 +651,7 @@ coaching individual
 0.57
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.44 – 0.69
+0.45 – 0.69
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
 <strong>\<0.001</strong>
@@ -626,7 +665,7 @@ coaching group
 0.62
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.48 – 0.77
+0.48 – 0.76
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
 <strong>\<0.001</strong>
@@ -657,7 +696,7 @@ spillover control
 -0.02 – 0.16
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.146
+0.113
 </td>
 </tr>
 <tr>
@@ -684,14 +723,14 @@ Random Effects
 σ<sup>2</sup>
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
-0.99
+0.81
 </td>
 <tr>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
 τ<sub>00</sub> <sub>village</sub>
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
-0.01
+0.02
 </td>
 <tr>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
@@ -726,7 +765,7 @@ Random Effects
 ICC
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
-0.01
+0.02
 </td>
 <tr>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
@@ -762,7 +801,7 @@ Observations
 Marginal R<sup>2</sup> / Conditional R<sup>2</sup>
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
-0.153 / 0.166
+0.179 / 0.195
 </td>
 </tr>
 </table>
@@ -790,10 +829,16 @@ We will define the coach effect as the coach-level ICC.
 ```
 
     ##        grp vcov  icc percent
-    ## 1    group 0.09 0.08    7.85
-    ## 2    coach 0.06 0.05    5.14
-    ## 3  village 0.01 0.01    1.29
-    ## 4 Residual 0.99 0.86   85.72
+    ## 1    group 0.09 0.09    9.32
+    ## 2    coach 0.06 0.06    5.99
+    ## 3  village 0.02 0.02    1.60
+    ## 4 Residual 0.81 0.83   83.09
+
+Note that ICC for `group` as calculated by this function represents only
+the variation explained by `group` *beyond the variation explained by
+`coach`*. Since group is nested in coach, the ICC for observations in
+the same group is actually the sum of the values for group and coach in
+this table.
 
 ## Descriptive exploration of coaching variability (Activity 1.2)
 
@@ -803,41 +848,39 @@ and visualize coaching variability. One way to do this is to use the
 package to calculate the group-level effects for coaches.
 
 ``` r
+# https://easystats.github.io/modelbased/reference/estimate_grouplevel.html
   m1_coach <- estimate_grouplevel(m1[[1]])
   m1_coach %>% as_tibble %>% arrange(desc(Coefficient)) %>%print(n=20)
 ```
 
     ## # A tibble: 9,477 × 8
-    ##    Group Level  Parameter Coefficient    SE    CI    CI_low CI_high
-    ##    <chr> <chr>  <chr>           <dbl> <dbl> <dbl>     <dbl>   <dbl>
-    ##  1 coach c_55   trt             0.673 0.170  0.95  0.340      1.01 
-    ##  2 group g_43   trt             0.575 0.201  0.95  0.180      0.970
-    ##  3 group g_69   trt             0.551 0.201  0.95  0.156      0.946
-    ##  4 group g_57   trt             0.521 0.201  0.95  0.127      0.916
-    ##  5 group g_4    trt             0.481 0.222  0.95  0.0447     0.916
-    ##  6 group g_81   trt             0.466 0.201  0.95  0.0710     0.861
-    ##  7 group g_103  trt             0.450 0.222  0.95  0.0141     0.886
-    ##  8 group g_123  trt             0.449 0.222  0.95  0.0135     0.885
-    ##  9 group g_1207 trt             0.418 0.222  0.95 -0.0178     0.854
-    ## 10 group g_1228 trt             0.394 0.201  0.95 -0.000324   0.789
-    ## 11 group g_1232 trt             0.361 0.201  0.95 -0.0336     0.755
-    ## 12 group g_125  trt             0.350 0.222  0.95 -0.0859     0.786
-    ## 13 group g_114  trt             0.328 0.222  0.95 -0.108      0.764
-    ## 14 group g_79   trt             0.328 0.201  0.95 -0.0673     0.722
-    ## 15 coach c_4    trt             0.314 0.204  0.95 -0.0854     0.714
-    ## 16 group g_1296 trt             0.314 0.222  0.95 -0.122      0.750
-    ## 17 group g_1198 trt             0.304 0.222  0.95 -0.132      0.740
-    ## 18 group g_1252 trt             0.303 0.201  0.95 -0.0913     0.698
-    ## 19 group g_1208 trt             0.300 0.222  0.95 -0.136      0.736
-    ## 20 group g_66   trt             0.300 0.201  0.95 -0.0952     0.694
+    ##    Group Level  Parameter Coefficient    SE    CI   CI_low CI_high
+    ##    <chr> <chr>  <chr>           <dbl> <dbl> <dbl>    <dbl>   <dbl>
+    ##  1 coach c_55   trt             0.671 0.168  0.95  0.341     1.00 
+    ##  2 group g_43   trt             0.592 0.195  0.95  0.210     0.974
+    ##  3 group g_69   trt             0.573 0.195  0.95  0.191     0.956
+    ##  4 group g_57   trt             0.546 0.195  0.95  0.164     0.928
+    ##  5 group g_4    trt             0.507 0.219  0.95  0.0779    0.936
+    ##  6 group g_81   trt             0.475 0.195  0.95  0.0927    0.857
+    ##  7 group g_103  trt             0.470 0.219  0.95  0.0406    0.899
+    ##  8 group g_123  trt             0.438 0.219  0.95  0.00847   0.867
+    ##  9 group g_1207 trt             0.420 0.219  0.95 -0.00919   0.849
+    ## 10 group g_1228 trt             0.392 0.195  0.95  0.00969   0.774
+    ## 11 group g_1232 trt             0.365 0.195  0.95 -0.0170    0.747
+    ## 12 group g_114  trt             0.347 0.219  0.95 -0.0821    0.776
+    ## 13 group g_125  trt             0.341 0.219  0.95 -0.0879    0.771
+    ## 14 group g_79   trt             0.335 0.195  0.95 -0.0471    0.718
+    ## 15 coach c_4    trt             0.326 0.202  0.95 -0.0694    0.721
+    ## 16 group g_66   trt             0.322 0.195  0.95 -0.0599    0.705
+    ## 17 group g_1296 trt             0.320 0.219  0.95 -0.109     0.749
+    ## 18 group g_1252 trt             0.311 0.195  0.95 -0.0710    0.693
+    ## 19 group g_1198 trt             0.304 0.219  0.95 -0.125     0.733
+    ## 20 coach c_75   trt             0.302 0.202  0.95 -0.0933    0.697
     ## # … with 9,457 more rows
 
-Given the original model has `(0 + trt | coach)`, which is how I said
-coaches are only in treatment arms 1-3, I think what we get for coach is
-the effect of trt for each coach. Specifically, these are deviations
-from the effect of the intervention on food security. Coefficients close
-to 0 indicate that the coach’s effect is close to the population-level
-effect.
+These are deviations from the effect of the intervention (`trt==1`) on
+food security. Coefficients close to 0 indicate that the coach’s effect
+is close to the population-level effect.
 
 ``` r
   c_include <- df %>% 
@@ -890,11 +933,356 @@ effect.
                                             size=18)))
 ```
 
-![](sim_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](sim_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+I believe this is equivalent to `trt` below:
+
+``` r
+  coach <- coef(m1[[1]])$coach
+  coach_re <- coach %>%
+    mutate(coach = row.names(coach)) %>%
+    select(coach, trt, "(Intercept)") %>%
+    filter(coach %in% c_include) %>%
+    left_join(coach_setting, by = c("coach" = "Level")) 
+```
+
+We can use this to identify the most and least effective coaches and
+then qualitatively explore their records to generate some hypotheses
+about why some coaches appear to have more impact on participants than
+others.
+
+For instance, we could identify the coaches in each setting who are +/-
+1 SD away from the population-level effect.
+
+``` r
+  coach_re_sd <- coach_re %>%
+    group_by(host) %>%
+    mutate(trt_z = scale(trt)) %>%
+    ungroup() %>%
+    mutate(trt_top = case_when(
+      trt_z >= 1 ~ 1,
+      TRUE ~ 0
+    )) %>%
+    mutate(trt_bottom = case_when(
+      trt_z <= -1 ~ 1,
+      TRUE ~ 0
+    ))
+    
+  coach_re_sd %>% 
+    group_by(host) %>% 
+    summarize(top = sum(trt_top), 
+              bottom = sum(trt_bottom))
+```
+
+    ## # A tibble: 2 × 3
+    ##   host      top bottom
+    ##   <fct>   <dbl>  <dbl>
+    ## 1 Refugee    15     17
+    ## 2 Host       11     14
+
+``` r
+  coach_re_sd %>%
+    filter(trt_top == 1) 
+```
+
+    ## # A tibble: 26 × 7
+    ##    coach    trt `(Intercept)` host    trt_z[,1] trt_top trt_bottom
+    ##    <chr>  <dbl>         <dbl> <fct>       <dbl>   <dbl>      <dbl>
+    ##  1 c_1170 0.195       -0.0285 Refugee      1.57       1          0
+    ##  2 c_1171 0.156       -0.0285 Refugee      1.26       1          0
+    ##  3 c_1174 0.153       -0.0285 Refugee      1.24       1          0
+    ##  4 c_1178 0.147       -0.0285 Refugee      1.19       1          0
+    ##  5 c_1179 0.270       -0.0285 Refugee      2.15       1          0
+    ##  6 c_1180 0.190       -0.0285 Refugee      1.53       1          0
+    ##  7 c_1185 0.166       -0.0285 Refugee      1.34       1          0
+    ##  8 c_1186 0.128       -0.0285 Refugee      1.04       1          0
+    ##  9 c_1204 0.240       -0.0285 Refugee      1.92       1          0
+    ## 10 c_1205 0.278       -0.0285 Refugee      2.22       1          0
+    ## # … with 16 more rows
+
+``` r
+  coach_re_sd %>%
+    filter(trt_bottom == 1) 
+```
+
+    ## # A tibble: 31 × 7
+    ##    coach     trt `(Intercept)` host    trt_z[,1] trt_top trt_bottom
+    ##    <chr>   <dbl>         <dbl> <fct>       <dbl>   <dbl>      <dbl>
+    ##  1 c_1152 -0.182       -0.0285 Refugee     -1.39       0          1
+    ##  2 c_1153 -0.137       -0.0285 Refugee     -1.04       0          1
+    ##  3 c_1157 -0.283       -0.0285 Refugee     -2.19       0          1
+    ##  4 c_1168 -0.223       -0.0285 Refugee     -1.72       0          1
+    ##  5 c_1183 -0.180       -0.0285 Refugee     -1.37       0          1
+    ##  6 c_1199 -0.365       -0.0285 Refugee     -2.83       0          1
+    ##  7 c_1201 -0.144       -0.0285 Refugee     -1.10       0          1
+    ##  8 c_1203 -0.249       -0.0285 Refugee     -1.92       0          1
+    ##  9 c_1207 -0.176       -0.0285 Refugee     -1.35       0          1
+    ## 10 c_1208 -0.144       -0.0285 Refugee     -1.09       0          1
+    ## # … with 21 more rows
+
+We could then look qualitatively at each top/bottom coach’s case records
+to generate ideas about what makes someone a top or bottom coach.
+
+In addition, we could incorporate an indicator for being a top coach
+into the model and estimate the impact of having a top coach. \[Coaches
+were randomized to groups, but this randomization was broken to some
+extent.\]
+
+``` r
+  df <- df %>%
+    left_join(select(coach_re_sd, coach, trt_top, trt_bottom)) %>%
+    mutate(trt_top = case_when(
+      is.na(trt_top) ~ 0,
+      TRUE ~ trt_top
+    )) %>%
+    mutate(trt_bottom = case_when(
+        is.na(trt_bottom) ~ 0,
+        TRUE ~ trt_bottom
+      ))
+  
+  m1_top <- lmer(y ~ trt_top +
+                     coaching_group + 
+                     coaching_individual + 
+                     no_asset + 
+                     host + 
+                     (1 | village) + 
+                     (0 + trt | coach) + 
+                     (0 + trt | group), 
+                data=df %>% mutate(trt_top = factor(trt_top)))
+  
+  tab_model(m1_top)
+```
+
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+y
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.02
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.07 – 0.04
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.530
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+trt top \[1\]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.75
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.62 – 0.89
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>\<0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+coaching group
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.51
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.40 – 0.62
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>\<0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+coaching individual
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.43
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.32 – 0.54
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>\<0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+no asset
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.56
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.42 – 0.70
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>\<0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+host
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.28
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.21 – 0.35
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>\<0.001</strong>
+</td>
+</tr>
+<tr>
+<td colspan="4" style="font-weight:bold; text-align:left; padding-top:.8em;">
+Random Effects
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+σ<sup>2</sup>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.81
+</td>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+τ<sub>00</sub> <sub>village</sub>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.02
+</td>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+τ<sub>11</sub> <sub>group.trt</sub>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.08
+</td>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+τ<sub>11</sub> <sub>coach.trt</sub>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.00
+</td>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+ρ<sub>01</sub>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+ 
+</td>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+ρ<sub>01</sub>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+ 
+</td>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+N <sub>village</sub>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+114
+</td>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+N <sub>coach</sub>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+4653
+</td>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+N <sub>group</sub>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+4710
+</td>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+10830
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+Marginal R<sup>2</sup> / Conditional R<sup>2</sup>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.216 / NA
+</td>
+</tr>
+</table>
+
+``` r
+  plot_model(m1_top)
+```
+
+![](sim_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+``` r
+  m1_top_p <- ggeffects::ggpredict(m1_top, "trt_top")
+  m1_top_p
+```
+
+    ## # Predicted values of y
+    ## 
+    ## trt_top | Predicted |       95% CI
+    ## ----------------------------------
+    ## 0       |      0.50 | [0.46, 0.54]
+    ## 1       |      1.25 | [1.12, 1.38]
+    ## 
+    ## Adjusted for:
+    ## *      coaching_group = 0.20
+    ## * coaching_individual = 0.39
+    ## *            no_asset = 0.20
+    ## *                host = 0.49
+    ## *                 trt = 0.59
+    ## *             village = 0 (population-level)
+    ## *               coach = 0 (population-level)
+    ## *               group = 0 (population-level)
+
+``` r
+  plot(m1_top_p)
+```
+
+![](sim_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
 
 # To Do
 
 -   Determine the extent to which coach randomization was broken
--   Incorporate baseline data into the model.
+-   Incorporate baseline data into the model
 -   Set up an analysis to estimate how coach effects vary by
-    pre-treatment severity.
+    pre-treatment severity

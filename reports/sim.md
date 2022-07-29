@@ -946,18 +946,17 @@ I believe this is equivalent to `trt` below:
     left_join(coach_setting, by = c("coach" = "Level")) 
 ```
 
-We can use this to identify the most and least effective coaches and
-then qualitatively explore their records to generate some hypotheses
+We can use this to identify the most and least effective coaches (e.g.,
+coaches +/- 1 SD away from the population-level effect) and then
+qualitatively explore their program records to generate some hypotheses
 about why some coaches appear to have more impact on participants than
 others.
-
-For instance, we could identify the coaches in each setting who are +/-
-1 SD away from the population-level effect.
 
 ``` r
   coach_re_sd <- coach_re %>%
     group_by(host) %>%
-    mutate(trt_z = scale(trt)) %>%
+    mutate(trt_z = scale(trt),
+           trt_z = as.numeric(trt_z)) %>%
     ungroup() %>%
     mutate(trt_top = case_when(
       trt_z >= 1 ~ 1,
@@ -986,18 +985,18 @@ For instance, we could identify the coaches in each setting who are +/-
 ```
 
     ## # A tibble: 26 × 7
-    ##    coach    trt `(Intercept)` host    trt_z[,1] trt_top trt_bottom
-    ##    <chr>  <dbl>         <dbl> <fct>       <dbl>   <dbl>      <dbl>
-    ##  1 c_1170 0.195       -0.0285 Refugee      1.57       1          0
-    ##  2 c_1171 0.156       -0.0285 Refugee      1.26       1          0
-    ##  3 c_1174 0.153       -0.0285 Refugee      1.24       1          0
-    ##  4 c_1178 0.147       -0.0285 Refugee      1.19       1          0
-    ##  5 c_1179 0.270       -0.0285 Refugee      2.15       1          0
-    ##  6 c_1180 0.190       -0.0285 Refugee      1.53       1          0
-    ##  7 c_1185 0.166       -0.0285 Refugee      1.34       1          0
-    ##  8 c_1186 0.128       -0.0285 Refugee      1.04       1          0
-    ##  9 c_1204 0.240       -0.0285 Refugee      1.92       1          0
-    ## 10 c_1205 0.278       -0.0285 Refugee      2.22       1          0
+    ##    coach    trt `(Intercept)` host    trt_z trt_top trt_bottom
+    ##    <chr>  <dbl>         <dbl> <fct>   <dbl>   <dbl>      <dbl>
+    ##  1 c_1170 0.195       -0.0285 Refugee  1.57       1          0
+    ##  2 c_1171 0.156       -0.0285 Refugee  1.26       1          0
+    ##  3 c_1174 0.153       -0.0285 Refugee  1.24       1          0
+    ##  4 c_1178 0.147       -0.0285 Refugee  1.19       1          0
+    ##  5 c_1179 0.270       -0.0285 Refugee  2.15       1          0
+    ##  6 c_1180 0.190       -0.0285 Refugee  1.53       1          0
+    ##  7 c_1185 0.166       -0.0285 Refugee  1.34       1          0
+    ##  8 c_1186 0.128       -0.0285 Refugee  1.04       1          0
+    ##  9 c_1204 0.240       -0.0285 Refugee  1.92       1          0
+    ## 10 c_1205 0.278       -0.0285 Refugee  2.22       1          0
     ## # … with 16 more rows
 
 ``` r
@@ -1006,22 +1005,19 @@ For instance, we could identify the coaches in each setting who are +/-
 ```
 
     ## # A tibble: 31 × 7
-    ##    coach     trt `(Intercept)` host    trt_z[,1] trt_top trt_bottom
-    ##    <chr>   <dbl>         <dbl> <fct>       <dbl>   <dbl>      <dbl>
-    ##  1 c_1152 -0.182       -0.0285 Refugee     -1.39       0          1
-    ##  2 c_1153 -0.137       -0.0285 Refugee     -1.04       0          1
-    ##  3 c_1157 -0.283       -0.0285 Refugee     -2.19       0          1
-    ##  4 c_1168 -0.223       -0.0285 Refugee     -1.72       0          1
-    ##  5 c_1183 -0.180       -0.0285 Refugee     -1.37       0          1
-    ##  6 c_1199 -0.365       -0.0285 Refugee     -2.83       0          1
-    ##  7 c_1201 -0.144       -0.0285 Refugee     -1.10       0          1
-    ##  8 c_1203 -0.249       -0.0285 Refugee     -1.92       0          1
-    ##  9 c_1207 -0.176       -0.0285 Refugee     -1.35       0          1
-    ## 10 c_1208 -0.144       -0.0285 Refugee     -1.09       0          1
+    ##    coach     trt `(Intercept)` host    trt_z trt_top trt_bottom
+    ##    <chr>   <dbl>         <dbl> <fct>   <dbl>   <dbl>      <dbl>
+    ##  1 c_1152 -0.182       -0.0285 Refugee -1.39       0          1
+    ##  2 c_1153 -0.137       -0.0285 Refugee -1.04       0          1
+    ##  3 c_1157 -0.283       -0.0285 Refugee -2.19       0          1
+    ##  4 c_1168 -0.223       -0.0285 Refugee -1.72       0          1
+    ##  5 c_1183 -0.180       -0.0285 Refugee -1.37       0          1
+    ##  6 c_1199 -0.365       -0.0285 Refugee -2.83       0          1
+    ##  7 c_1201 -0.144       -0.0285 Refugee -1.10       0          1
+    ##  8 c_1203 -0.249       -0.0285 Refugee -1.92       0          1
+    ##  9 c_1207 -0.176       -0.0285 Refugee -1.35       0          1
+    ## 10 c_1208 -0.144       -0.0285 Refugee -1.09       0          1
     ## # … with 21 more rows
-
-We could then look qualitatively at each top/bottom coach’s case records
-to generate ideas about what makes someone a top or bottom coach.
 
 In addition, we could incorporate an indicator for being a top coach
 into the model and estimate the impact of having a top coach. \[Coaches
@@ -1042,13 +1038,13 @@ extent.\]
   
   m1_top <- lmer(y ~ trt_top +
                      coaching_group + 
-                     coaching_individual + 
-                     no_asset + 
                      host + 
                      (1 | village) + 
-                     (0 + trt | coach) + 
-                     (0 + trt | group), 
-                data=df %>% mutate(trt_top = factor(trt_top)))
+                     (1 | coach:group), 
+                data = df %>% 
+                         mutate(trt_top = factor(trt_top)) %>% 
+                         filter(trt==1)
+                )
   
   tab_model(m1_top)
 ```
@@ -1081,13 +1077,13 @@ p
 (Intercept)
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
--0.02
+0.69
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
--0.07 – 0.04
+0.54 – 0.83
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.530
+<strong>\<0.001</strong>
 </td>
 </tr>
 <tr>
@@ -1095,10 +1091,10 @@ p
 trt top \[1\]
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.75
+0.72
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.62 – 0.89
+0.58 – 0.86
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
 <strong>\<0.001</strong>
@@ -1109,41 +1105,13 @@ trt top \[1\]
 coaching group
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.51
+-0.23
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.40 – 0.62
+-0.42 – -0.04
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-<strong>\<0.001</strong>
-</td>
-</tr>
-<tr>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
-coaching individual
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.43
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.32 – 0.54
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-<strong>\<0.001</strong>
-</td>
-</tr>
-<tr>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
-no asset
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.56
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.42 – 0.70
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-<strong>\<0.001</strong>
+<strong>0.015</strong>
 </td>
 </tr>
 <tr>
@@ -1151,13 +1119,13 @@ no asset
 host
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.28
+0.33
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.21 – 0.35
+0.14 – 0.52
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-<strong>\<0.001</strong>
+<strong>0.001</strong>
 </td>
 </tr>
 <tr>
@@ -1170,70 +1138,56 @@ Random Effects
 σ<sup>2</sup>
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
-0.81
+0.80
 </td>
 <tr>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
-τ<sub>00</sub> <sub>village</sub>
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
-0.02
-</td>
-<tr>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
-τ<sub>11</sub> <sub>group.trt</sub>
+τ<sub>00</sub> <sub>coach:group</sub>
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
 0.08
 </td>
 <tr>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
-τ<sub>11</sub> <sub>coach.trt</sub>
+τ<sub>00</sub> <sub>village</sub>
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
-0.00
+0.08
 </td>
 <tr>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
-ρ<sub>01</sub>
+ICC
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
- 
-</td>
-<tr>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
-ρ<sub>01</sub>
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
- 
+0.17
 </td>
 <tr>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
 N <sub>village</sub>
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
-114
+43
 </td>
 <tr>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
 N <sub>coach</sub>
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
-4653
+198
 </td>
 <tr>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
 N <sub>group</sub>
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
-4710
+255
 </td>
 <tr>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
 Observations
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
-10830
+6375
 </td>
 </tr>
 <tr>
@@ -1241,7 +1195,7 @@ Observations
 Marginal R<sup>2</sup> / Conditional R<sup>2</sup>
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
-0.216 / NA
+0.088 / 0.241
 </td>
 </tr>
 </table>
@@ -1252,33 +1206,40 @@ Marginal R<sup>2</sup> / Conditional R<sup>2</sup>
 
 ![](sim_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
+Estimated marginal means for clients of top coaches
+
 ``` r
-  m1_top_p <- ggeffects::ggpredict(m1_top, "trt_top")
+  m1_top_p <- ggeffects::ggpredict(m1_top, "trt_top", type="random")
   m1_top_p
 ```
 
     ## # Predicted values of y
     ## 
-    ## trt_top | Predicted |       95% CI
-    ## ----------------------------------
-    ## 0       |      0.50 | [0.46, 0.54]
-    ## 1       |      1.25 | [1.12, 1.38]
+    ## trt_top | Predicted |        95% CI
+    ## -----------------------------------
+    ## 0       |      0.77 | [-0.99, 2.53]
+    ## 1       |      1.50 | [-0.27, 3.26]
     ## 
     ## Adjusted for:
-    ## *      coaching_group = 0.20
-    ## * coaching_individual = 0.39
-    ## *            no_asset = 0.20
-    ## *                host = 0.49
-    ## *                 trt = 0.59
-    ## *             village = 0 (population-level)
-    ## *               coach = 0 (population-level)
-    ## *               group = 0 (population-level)
+    ## * coaching_group = 0.33
+    ## *           host = 0.49
+    ## *        village = 0 (population-level)
+    ## *          coach = 0 (population-level)
+    ## *          group = 0 (population-level)
 
 ``` r
   plot(m1_top_p)
 ```
 
-![](sim_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
+![](sim_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+
+from the function help:
+
+> type = “random” still returns population-level predictions, however,
+> unlike type = “fixed”, intervals also consider the uncertainty in the
+> variance parameters (the mean random effect variance, see Johnson et
+> al. 2014 for details) and hence can be considered as prediction
+> intervals.
 
 # To Do
 

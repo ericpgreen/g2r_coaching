@@ -445,6 +445,7 @@ Next we use this function to simulate some data and run a few checks.
     as_tibble() %>%
     print(n=16)
 ```
+
 ```{r}
   df %>% 
     mutate(arm_f = factor(arm,
@@ -605,14 +606,13 @@ I believe this is equivalent to `trt` below:
     left_join(coach_setting, by = c("coach" = "Level")) 
 ```
 
-We can use this to identify the most and least effective coaches and then qualitatively explore their records to generate some hypotheses about why some coaches appear to have more impact on participants than others.
-
-For instance, we could identify the coaches in each setting who are +/- 1 SD away from the population-level effect.
+We can use this to identify the most and least effective coaches (e.g., coaches +/- 1 SD away from the population-level effect) and then qualitatively explore their program records to generate some hypotheses about why some coaches appear to have more impact on participants than others.
 
 ```{r}
   coach_re_sd <- coach_re %>%
     group_by(host) %>%
-    mutate(trt_z = scale(trt)) %>%
+    mutate(trt_z = scale(trt),
+           trt_z = as.numeric(trt_z)) %>%
     ungroup() %>%
     mutate(trt_top = case_when(
       trt_z >= 1 ~ 1,
@@ -635,8 +635,6 @@ For instance, we could identify the coaches in each setting who are +/- 1 SD awa
     filter(trt_bottom == 1) 
 ```
 
-We could then look qualitatively at each top/bottom coach's case records to generate ideas about what makes someone a top or bottom coach.
-
 In addition, we could incorporate an indicator for being a top coach into the model and estimate the impact of having a top coach. [Coaches were randomized to groups, but this randomization was broken to some extent.] 
 
 ```{r}
@@ -653,23 +651,30 @@ In addition, we could incorporate an indicator for being a top coach into the mo
   
   m1_top <- lmer(y ~ trt_top +
                      coaching_group + 
-                     coaching_individual + 
-                     no_asset + 
                      host + 
                      (1 | village) + 
-                     (0 + trt | coach) + 
-                     (0 + trt | group), 
-                data=df %>% mutate(trt_top = factor(trt_top)))
+                     (1 | coach:group), 
+                data = df %>% 
+                         mutate(trt_top = factor(trt_top)) %>% 
+                         filter(trt==1)
+                )
   
   tab_model(m1_top)
   
   plot_model(m1_top)
-  
-  m1_top_p <- ggeffects::ggpredict(m1_top, "trt_top")
+```
+
+Estimated marginal means for clients of top coaches
+
+```{r}
+  m1_top_p <- ggeffects::ggpredict(m1_top, "trt_top", type="random")
   m1_top_p
   plot(m1_top_p)
 ```
 
+from the function help:
+
+> type = "random" still returns population-level predictions, however, unlike type = "fixed", intervals also consider the uncertainty in the variance parameters (the mean random effect variance, see Johnson et al. 2014 for details) and hence can be considered as prediction intervals.
 
 # To Do
 

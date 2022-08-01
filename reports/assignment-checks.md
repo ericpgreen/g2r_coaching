@@ -44,26 +44,26 @@ file came from AVSI’s M&E team:
 ``` r
   avsi <- readxl::read_excel(paste0(path, "Cohort one coach assignment.xlsx")) %>%
       rename("Setting" = "Participant Type") %>%
-    mutate(in_avsi = "yes") 
+    mutate(in_avsi = "yes") %>%
+    select(-`Coach Name`, -`Group Name`)
   
   avsi
 ```
 
-    ## # A tibble: 266 × 10
-    ##    Subcounty   `Village Clust…` Village Setting `HH Arm` `Group ID` `Group Name`
-    ##    <chr>       <chr>            <chr>   <chr>   <chr>    <chr>      <chr>       
-    ##  1 NKOMA-KATA… BULEGEYA II (13… BULEGE… Host    Arm 3    G2R-033    Twetungure …
-    ##  2 NKOMA-KATA… BULEGEYA II (13… BULEGE… Host    Arm 1    G2R-031    Twimukye vi…
-    ##  3 NKOMA-KATA… BULEGEYA II (13… BULEGE… Host    Arm 2    G2R-032    Tukwatanise…
-    ##  4 NKOMA-KATA… DAMASIKO (138) … DAMASI… Host    Arm 1    G2R-026    Tukorereham…
-    ##  5 NKOMA-KATA… DAMASIKO (138) … DAMASI… Host    Arm 3    G2R-027    Twimukye    
-    ##  6 NKOMA-KATA… DAMASIKO (138) … DAMASI… Host    Arm 2    G2R-028    Tukwatanise 
-    ##  7 NKOMA-KATA… KATALYEBA (139)… KATALY… Host    Arm 2    G2R-029    Tuyambane   
-    ##  8 NKOMA-KATA… KATALYEBA (139)… KATALY… Host    Arm 1    G2R-030    Nkoma KATAL…
-    ##  9 NKOMA-KATA… KATALYEBA (139)… KATALY… Host    Arm 3    G2R-014    Agalihamu G…
-    ## 10 NKOMA-KATA… MAHANI I (141) … RWEMBU… Host    Arm 2    G2R-013    Tukwatanise…
-    ## # … with 256 more rows, and 3 more variables: `Coach ID` <chr>,
-    ## #   `Coach Name` <chr>, in_avsi <chr>
+    ## # A tibble: 266 × 8
+    ##    Subcounty     `Village Clust…` Village Setting `HH Arm` `Group ID` `Coach ID`
+    ##    <chr>         <chr>            <chr>   <chr>   <chr>    <chr>      <chr>     
+    ##  1 NKOMA-KATALY… BULEGEYA II (13… BULEGE… Host    Arm 3    G2R-033    KM067     
+    ##  2 NKOMA-KATALY… BULEGEYA II (13… BULEGE… Host    Arm 1    G2R-031    KM317     
+    ##  3 NKOMA-KATALY… BULEGEYA II (13… BULEGE… Host    Arm 2    G2R-032    KM125     
+    ##  4 NKOMA-KATALY… DAMASIKO (138) … DAMASI… Host    Arm 1    G2R-026    KM136     
+    ##  5 NKOMA-KATALY… DAMASIKO (138) … DAMASI… Host    Arm 3    G2R-027    KM073     
+    ##  6 NKOMA-KATALY… DAMASIKO (138) … DAMASI… Host    Arm 2    G2R-028    KM200     
+    ##  7 NKOMA-KATALY… KATALYEBA (139)… KATALY… Host    Arm 2    G2R-029    KM200     
+    ##  8 NKOMA-KATALY… KATALYEBA (139)… KATALY… Host    Arm 1    G2R-030    KM156     
+    ##  9 NKOMA-KATALY… KATALYEBA (139)… KATALY… Host    Arm 3    G2R-014    KM133     
+    ## 10 NKOMA-KATALY… MAHANI I (141) … RWEMBU… Host    Arm 2    G2R-013    KM341     
+    ## # … with 256 more rows, and 1 more variable: in_avsi <chr>
 
 # Number of coaches
 

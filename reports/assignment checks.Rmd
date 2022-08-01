@@ -34,7 +34,8 @@ After randomization, AVSI made some changes to coach assignments. This file came
 ```{r}
   avsi <- readxl::read_excel(paste0(path, "Cohort one coach assignment.xlsx")) %>%
       rename("Setting" = "Participant Type") %>%
-    mutate(in_avsi = "yes") 
+    mutate(in_avsi = "yes") %>%
+    select(-`Coach Name`, -`Group Name`)
   
   avsi
 ```

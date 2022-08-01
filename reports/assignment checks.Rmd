@@ -25,8 +25,6 @@ In Cohort 1, IPA randomly assigned coaches to format (individual/group) and then
   
   ipa <- bind_rows(ipa_host, ipa_ref) %>%
     mutate(in_ipa = "yes") 
-  
-  ipa
 ```
 
 After randomization, AVSI made some changes to coach assignments. This file came from AVSI's M&E team:
@@ -36,8 +34,6 @@ After randomization, AVSI made some changes to coach assignments. This file came
       rename("Setting" = "Participant Type") %>%
     mutate(in_avsi = "yes") %>%
     select(-`Coach Name`, -`Group Name`)
-  
-  avsi
 ```
 # Number of coaches 
 

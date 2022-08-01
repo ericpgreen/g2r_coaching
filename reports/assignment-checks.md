@@ -19,24 +19,7 @@ and then to groups assigned to the same format (individual: arms 1 and
   
   ipa <- bind_rows(ipa_host, ipa_ref) %>%
     mutate(in_ipa = "yes") 
-  
-  ipa
 ```
-
-    ## # A tibble: 265 × 7
-    ##    coachid           vil_clus    list_hh_gr25_ABC grouptype treat setting in_ipa
-    ##    <chr>             <chr>       <chr>            <chr>     <chr> <chr>   <chr> 
-    ##  1 HOST_POS_95_ADD_1 NTONWA (87) C                ind       Arm 1 Host    yes   
-    ##  2 HOST_POS_96_ADD_2 RUBONA (98) B                ind       Arm 1 Host    yes   
-    ##  3 HOST_POS_97_ADD_3 BISAYUMBE … C                ind       Arm 1 Host    yes   
-    ##  4 KM011             NTONWA (87) A                ind       Arm 3 Host    yes   
-    ##  5 KM012             KANYONZA I… B                group     Arm 2 Host    yes   
-    ##  6 KM012             RWENSIKIZA… D                group     Arm 2 Host    yes   
-    ##  7 KM012             KAKINGA (4… E                group     Arm 2 Host    yes   
-    ##  8 KM012             BIGOLO (10… F                group     Arm 2 Host    yes   
-    ##  9 KM012             BIGOLO (10… G                group     Arm 2 Host    yes   
-    ## 10 KM013             KAYEMBE (7… C                group     Arm 2 Host    yes   
-    ## # … with 255 more rows
 
 After randomization, AVSI made some changes to coach assignments. This
 file came from AVSI’s M&E team:
@@ -46,24 +29,7 @@ file came from AVSI’s M&E team:
       rename("Setting" = "Participant Type") %>%
     mutate(in_avsi = "yes") %>%
     select(-`Coach Name`, -`Group Name`)
-  
-  avsi
 ```
-
-    ## # A tibble: 266 × 8
-    ##    Subcounty     `Village Clust…` Village Setting `HH Arm` `Group ID` `Coach ID`
-    ##    <chr>         <chr>            <chr>   <chr>   <chr>    <chr>      <chr>     
-    ##  1 NKOMA-KATALY… BULEGEYA II (13… BULEGE… Host    Arm 3    G2R-033    KM067     
-    ##  2 NKOMA-KATALY… BULEGEYA II (13… BULEGE… Host    Arm 1    G2R-031    KM317     
-    ##  3 NKOMA-KATALY… BULEGEYA II (13… BULEGE… Host    Arm 2    G2R-032    KM125     
-    ##  4 NKOMA-KATALY… DAMASIKO (138) … DAMASI… Host    Arm 1    G2R-026    KM136     
-    ##  5 NKOMA-KATALY… DAMASIKO (138) … DAMASI… Host    Arm 3    G2R-027    KM073     
-    ##  6 NKOMA-KATALY… DAMASIKO (138) … DAMASI… Host    Arm 2    G2R-028    KM200     
-    ##  7 NKOMA-KATALY… KATALYEBA (139)… KATALY… Host    Arm 2    G2R-029    KM200     
-    ##  8 NKOMA-KATALY… KATALYEBA (139)… KATALY… Host    Arm 1    G2R-030    KM156     
-    ##  9 NKOMA-KATALY… KATALYEBA (139)… KATALY… Host    Arm 3    G2R-014    KM133     
-    ## 10 NKOMA-KATALY… MAHANI I (141) … RWEMBU… Host    Arm 2    G2R-013    KM341     
-    ## # … with 256 more rows, and 1 more variable: in_avsi <chr>
 
 # Number of coaches
 

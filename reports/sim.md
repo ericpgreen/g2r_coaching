@@ -141,7 +141,7 @@ A few things to note about the IPA strategy:
 We propose to fit a mixed model and incorporate information about
 setting as a fixed effect:
 
-    lmer(y ~ coaching_individual +  # assigned to arm 1
+    lmer(y ~ coaching_individual +  # assigned to arms 1 or 3
              coaching_group +       # assigned to arm 2
              no_asset +             # assigned to arm 3
              spillover_control +    # assigned to arm 4 (no program)
@@ -266,27 +266,24 @@ model.
     mutate(trt = case_when(
       village_trt == 0 ~ 0,
       arm == 4 ~ 0,
-      TRUE ~ 1)) %>%
-    mutate(spillover_control = case_when(
-      arm == 4 ~ 1,
-      TRUE ~ 0
-    ))
+      TRUE ~ 1)) 
   
-# indicators for coaching type
+# dummy indicators for arms
   df <- df %>%
     mutate(coaching_individual = case_when(
-      arm==1 | arm==3 ~ 1,
+      arm==1 ~ 1,
       TRUE ~ 0
     )) %>%
     mutate(coaching_group = case_when(
       arm==2 ~ 1,
       TRUE ~ 0
-    ))
-  
-# indicator for no asset
-  df <- df %>%
+    )) %>%
     mutate(no_asset = case_when(
       arm==3 ~ 1,
+      TRUE ~ 0
+    )) %>%
+    mutate(spillover_control = case_when(
+      arm == 4 ~ 1,
       TRUE ~ 0
     ))
   

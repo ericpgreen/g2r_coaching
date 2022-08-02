@@ -141,7 +141,7 @@ A few things to note about the IPA strategy:
 We propose to fit a mixed model and incorporate information about
 setting as a fixed effect:
 
-    lmer(y ~ coaching_individual +  # assigned to arms 1 or 3
+    lmer(y ~ coaching_individual +  # assigned to arm 1
              coaching_group +       # assigned to arm 2
              no_asset +             # assigned to arm 3
              spillover_control +    # assigned to arm 4 (no program)

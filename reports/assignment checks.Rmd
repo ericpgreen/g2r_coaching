@@ -139,7 +139,7 @@ AVSI found that 5 groups was too much and added more coaches to reduce the group
   
   writexl::write_xlsx(list(ipa_not_avsi = ipa_not_avsi, 
                            avsi_not_ipa = avsi_not_ipa), 
-                      path = "assignment checks.xlsx")
+                      path = "assignment-checks.xlsx")
 ```
 
 # Multiple coaches per arm per village

@@ -174,3 +174,90 @@ the group load to 3.
     ##   <chr>   <int> <int>
     ## 1 no         28   155
     ## 2 yes       127   155
+
+# Coach IDs in IPA but not AVSI
+
+``` r
+  ipa_not_avsi <- combined %>%
+    filter(in_ipa == "yes" & in_avsi == "no") %>%
+    distinct(coachid) 
+
+  avsi_not_ipa <- combined %>%
+    filter(in_ipa == "no" & in_avsi == "yes") %>%
+    distinct(coachid) 
+  
+  writexl::write_xlsx(list(ipa_not_avsi = ipa_not_avsi, 
+                           avsi_not_ipa = avsi_not_ipa), 
+                      path = "assignment checks.xlsx")
+```
+
+# Multiple coaches per arm per village
+
+Antoine notices that some clusters have multiple coaches in a given arm:
+
+``` r
+  avsi %>%
+    group_by(`Village Cluster`, `HH Arm`) %>%
+    count(name = "number coaches") %>%
+    filter(`number coaches`>1) %>%
+    left_join(select(avsi, `Village Cluster`, `HH Arm`)) %>%
+    distinct(`Village Cluster`, `HH Arm`, .keep_all = TRUE)
+```
+
+    ## # A tibble: 75 × 3
+    ## # Groups:   Village Cluster, HH Arm [75]
+    ##    `Village Cluster`                      `HH Arm` `number coaches`
+    ##    <chr>                                  <chr>               <int>
+    ##  1 BASE CAMP 1                            Arm 1                   2
+    ##  2 BASE CAMP 1                            Arm 2                   2
+    ##  3 BENGA B (1) + LYAKATAMA (27)           Arm 2                   2
+    ##  4 BENGA CENTRAL (2) + KANYEGARAMIRE (23) Arm 3                   2
+    ##  5 BIGOLO (103)                           Arm 2                   2
+    ##  6 BIGOLO (103)                           Arm 3                   2
+    ##  7 BITOJO (5) + BUBAARE (6)               Arm 1                   2
+    ##  8 BITOJO (5) + BUBAARE (6)               Arm 2                   3
+    ##  9 BITOJO (5) + BUBAARE (6)               Arm 3                   2
+    ## 10 BUGUTA B                               Arm 2                   2
+    ## # … with 65 more rows
+
+I think the issue here is that some village clusters have more than one
+group in arm 1, more than 1 group in arm 2, etc.
+
+``` r
+  ipa %>% 
+    mutate(treat = tolower(treat)) %>%
+    group_by(vil_clus, treat) %>% 
+    count(name = "number of groups") %>% 
+    filter(`number of groups`>1)
+```
+
+    ## # A tibble: 75 × 3
+    ## # Groups:   vil_clus, treat [75]
+    ##    vil_clus                               treat `number of groups`
+    ##    <chr>                                  <chr>              <int>
+    ##  1 BASE CAMP 1                            arm 1                  2
+    ##  2 BASE CAMP 1                            arm 2                  2
+    ##  3 BENGA B (1) + LYAKATAMA (27)           arm 2                  2
+    ##  4 BENGA CENTRAL (2) + KANYEGARAMIRE (23) arm 3                  2
+    ##  5 BIGOLO (103)                           arm 2                  2
+    ##  6 BIGOLO (103)                           arm 3                  2
+    ##  7 BITOJO (5) + BUBAARE (6)               arm 1                  2
+    ##  8 BITOJO (5) + BUBAARE (6)               arm 2                  2
+    ##  9 BITOJO (5) + BUBAARE (6)               arm 3                  2
+    ## 10 BUGUTA B                               arm 2                  2
+    ## # … with 65 more rows
+
+Confirming that group IDs do not repeat in clusters:
+
+``` r
+  avsi %>%
+    group_by(`Village Cluster`, `Group ID`) %>%
+    count() %>%
+    filter(n>1) %>%
+    left_join(select(avsi, `Village Cluster`, `HH Arm`, `Coach ID`, `Group ID`))
+```
+
+    ## # A tibble: 0 × 5
+    ## # Groups:   Village Cluster, Group ID [0]
+    ## # … with 5 variables: Village Cluster <chr>, Group ID <chr>, n <int>,
+    ## #   HH Arm <chr>, Coach ID <chr>

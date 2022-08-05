@@ -126,4 +126,51 @@ AVSI found that 5 groups was too much and added more coaches to reduce the group
     group_by(same_vc) %>% count() %>%
     ungroup() %>% mutate(N = sum(n))
 ```
+# Coach IDs in IPA but not AVSI
 
+```{r}
+  ipa_not_avsi <- combined %>%
+    filter(in_ipa == "yes" & in_avsi == "no") %>%
+    distinct(coachid) 
+
+  avsi_not_ipa <- combined %>%
+    filter(in_ipa == "no" & in_avsi == "yes") %>%
+    distinct(coachid) 
+  
+  writexl::write_xlsx(list(ipa_not_avsi = ipa_not_avsi, 
+                           avsi_not_ipa = avsi_not_ipa), 
+                      path = "assignment checks.xlsx")
+```
+
+# Multiple coaches per arm per village
+
+Antoine notices that some clusters have multiple coaches in a given arm:
+
+```{r}
+  avsi %>%
+    group_by(`Village Cluster`, `HH Arm`) %>%
+    count(name = "number coaches") %>%
+    filter(`number coaches`>1) %>%
+    left_join(select(avsi, `Village Cluster`, `HH Arm`)) %>%
+    distinct(`Village Cluster`, `HH Arm`, .keep_all = TRUE)
+```
+
+I think the issue here is that some village clusters have more than one group in arm 1, more than 1 group in arm 2, etc.
+
+```{r}
+  ipa %>% 
+    mutate(treat = tolower(treat)) %>%
+    group_by(vil_clus, treat) %>% 
+    count(name = "number of groups") %>% 
+    filter(`number of groups`>1)
+```
+
+Confirming that group IDs do not repeat in clusters:
+
+```{r}
+  avsi %>%
+    group_by(`Village Cluster`, `Group ID`) %>%
+    count() %>%
+    filter(n>1) %>%
+    left_join(select(avsi, `Village Cluster`, `HH Arm`, `Coach ID`, `Group ID`))
+```

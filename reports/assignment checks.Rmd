@@ -1,6 +1,6 @@
 ---
 title: "Cohort 1 Coach Assignments"
-output: github_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -8,15 +8,21 @@ output: github_document
                         cache = TRUE)
   options(scipen=999)
   library(tidyverse)
+  
+  path <- "/Users/epg4/Box Sync/AVSI Coaching/AVSI Coaching (Duke IPA)/Design/Assignments/"
 ```
 
 # Introduction
 
-In Cohort 1, IPA randomly assigned coaches to format (individual/group) and then to groups assigned to the same format (individual: arms 1 and 3; group: arm 2). These assignments are spread across two files from Jan 10, 2019:
+In Cohort 1, IPA randomly assigned coaches to program format (idividual vs group coaching) and then to one or more groups of participants assigned to the same format. The group coaches were randomly assigned to 5 groups of ~25 households each in Arm 2 (group coaching plus asset transfer), while the individual coaches were randomly assigned 1:1 to one 'group' of ~25 households in Arm 1 (individual coaching plus asset transfer) or Arm 3 (individual coaching, no asset transfer).
+
+We are interested in using data from Cohort 1 to estimate the 'coach effect' on participant outcomes, but it's unclear to what extent the original coach randomization was maintained. At some point after IPA randomized coaches, AVSI modified some assignments for logistical reasons. The purpose of this analysis is to document deviations from the original randomization.
+
+# How many coaches were randomly assigned?
+
+The first step is to determine how many coaches were randomly assigned in Cohort 1 and to document their original assignments. For this we will bind together two IPA datasets created on January 10, 2019:
 
 ```{r}
-  path <- "/Users/epg4/Box Sync/AVSI Coaching/AVSI Coaching (Duke IPA)/Design/Assignments/"
-  
   ipa_host <- readxl::read_excel(paste0(path, "coach_gr25_long_host_10 Jan 2019_sortCoach.xls")) %>%
     mutate(setting = "Host")
   
@@ -25,7 +31,17 @@ In Cohort 1, IPA randomly assigned coaches to format (individual/group) and then
   
   ipa <- bind_rows(ipa_host, ipa_ref) %>%
     mutate(in_ipa = "yes") 
+  
+  ipa %>%
+    group_by(grouptype, coachid) %>% count(name = "groups") %>% 
+    group_by(grouptype, groups) %>% count(name = "coach count") %>%
+    ungroup() %>%
+    mutate(total = sum(`coach count`))
 ```
+
+These files list `r nrow(distinct(ipa, coachid))` coaches: 175 assigned to individual coaching and 18 assigned to group coaching. According to our notes, we expected this number to be 194 coaches (18 group / 176 individual). **IPA: Is this file missing a coach?**
+
+# Actual coach assignments
 
 After randomization, AVSI made some changes to coach assignments. This file came from AVSI's M&E team:
 
@@ -33,35 +49,43 @@ After randomization, AVSI made some changes to coach assignments. This file came
   avsi <- readxl::read_excel(paste0(path, "Cohort one coach assignment.xlsx")) %>%
       rename("Setting" = "Participant Type") %>%
     mutate(in_avsi = "yes") %>%
-    select(-`Coach Name`, -`Group Name`)
+    select(-`Coach Name`, -`Group Name`) %>%
+    rename(coachid = "Coach ID")
 ```
-# Number of coaches 
+
+The AVSI file identifies `r nrow(distinct(avsi, coachid))` coaches, so `r nrow(distinct(avsi, coachid))-nrow(distinct(ipa, coachid))` more than the IPA records. No groups were assigned more than one coach in this file, so replacement coaches are not the obvious answer to this discrepancy. 
+
+```{r}
+  avsi %>%
+    group_by(`Group ID`) %>%
+    count(name = "number of coaches per group") %>% 
+    group_by(`number of coaches per group`) %>%
+    count(name = "groups")
+```
+It's worth checking to make sure that the files include the same number of groups. The IPA file does not include the same `Group ID` variable so we can't compare on it, but we can concatenate IPA's village cluster variable and the randomization group letter variable and then count the number of distinct values to get the number of groups represented in the IPA file:
 
 ```{r}
   ipa %>%
-    distinct(coachid, .keep_all = TRUE) %>%
-    group_by(setting) %>% 
-    count() %>% ungroup %>%
-    mutate(N = sum(n))
+    mutate(group = paste(vil_clus, list_hh_gr25_ABC)) %>%
+    distinct(group) %>%
+    count()
 ```
-```{r}
-  avsi %>%
-    distinct(`Coach ID`, .keep_all = TRUE) %>%
-    group_by(Setting) %>% 
-    count() %>% ungroup %>%
-    mutate(N = sum(n))
-```
+It appears that the files are off by 1 group (266 AVSI vs 265 IPA). **Is it possible that AVSI added a group after randomization?**
 
-# Matching coach IDs
+# Why different numbers of coaches?
+
+The AVSI file identifies `r nrow(distinct(avsi, coachid))` coaches, and the IPA file identifies `r nrow(distinct(ipa, coachid))` coaches. Why the discrepancy?
+
+To investigate further we can attempt to match coaches across files.
 
 ```{r}
   ipa %>%
     distinct(coachid, .keep_all = TRUE) %>%
     rename("Village Cluster" = "vil_clus") %>%
     select(coachid, in_ipa, `Village Cluster`) %>%
-    full_join(select(distinct(avsi, `Coach ID`, .keep_all=TRUE),
-                     `Coach ID`, in_avsi, `Village Cluster`), 
-              by = c("coachid" = "Coach ID")) %>%
+    full_join(select(distinct(avsi, coachid, .keep_all=TRUE),
+                     coachid, in_avsi, `Village Cluster`), 
+              by = "coachid") %>%
     mutate(in_ipa = case_when(
       is.na(in_ipa) ~ "no",
       TRUE ~ in_ipa
@@ -74,103 +98,165 @@ After randomization, AVSI made some changes to coach assignments. This file came
     group_by(in_ipa, in_avsi) %>% count()
 ```
 
-# Number of groups per coach
+This shows that 155 coach IDs are present in both files. Of the 87 single source coach IDs, 38 are only present in the IPA file and 49 are only present in the AVSI file.
 
-IPA randomized group coaches to 5 groups.
+## Coaches only in the AVSI file
 
-```{r}
-  ipa %>%
-    group_by(grouptype, coachid) %>% count(name = "groups") %>% 
-    group_by(grouptype, groups) %>% count(name = "coach count")
-```
-
-AVSI found that 5 groups was too much and added more coaches to reduce the group load to 3.
+Let's look at the 49 coaches only present in the AVSI file and join with AVSI-hiring date data:
 
 ```{r}
-  avsi %>%
-    mutate(grouptype = case_when(
-      `HH Arm` == "Arm 2" ~ "group",
-      TRUE ~ "ind")) %>%
-    group_by(grouptype, `Coach ID`) %>% count(name = "groups") %>% 
-    group_by(grouptype, groups) %>% count(name = "coach count")
+  avsi_hiring <- readxl::read_excel(paste0(path, "hiring.xlsx"),
+                                    sheet = "reformatted") %>%
+    mutate(hired_after_2018 = case_when(
+      is.na(start) ~ NA_character_,
+      start > lubridate::ymd("2018-12-31") ~ "Yes",
+      TRUE ~ "No"
+    ))
+
+  combined %>%
+    filter(in_ipa == "no") %>%
+    left_join(avsi_hiring, by = "coachid") %>%
+    group_by(hired_after_2018, dropped) %>%
+    count()
 ```
 
-# Matching village cluster IDs
-
-```{r}
-  ipa %>%
-    distinct(vil_clus, .keep_all = TRUE) %>%
-    select(vil_clus, in_ipa) %>%
-    full_join(select(distinct(avsi, `Village Cluster`, .keep_all=TRUE),
-                     `Village Cluster`, in_avsi), 
-              by = c("vil_clus" = "Village Cluster")) %>%
-    mutate(in_ipa = case_when(
-      is.na(in_ipa) ~ "no",
-      TRUE ~ in_ipa
-    )) %>%
-    mutate(in_avsi = case_when(
-      is.na(in_avsi) ~ "no",
-      TRUE ~ in_avsi
-    )) %>%
-    group_by(in_ipa, in_avsi) %>% count()
-```
-# Matching coach assignments for coach IDs in both
+According to AVSI's hiring data, 10/49 coaches only in the AVSI file were hired in 2018. 9/10 remained employed through the end of Cohort 1; 1/10 terminated before 2019. **Why are these 9 coaches not in the IPA file?**
 
 ```{r}
   combined %>%
-    filter(in_ipa == "yes" & in_avsi == "yes") %>%
-    mutate(same_vc = case_when(
-      `Village Cluster.x` == `Village Cluster.y` ~ "yes",
+    filter(in_ipa == "no") %>%
+    left_join(avsi_hiring, by = "coachid") %>%
+    filter(hired_after_2018 == "No", dropped=="No") %>%
+    select(coachid, `Village Cluster.y`, end)
+```
+27/49 coaches only in the AVSI file were hired after 2018 and remained in the program until the end of Cohort 1. **Were these replacements coaches??**
+
+```{r}
+  combined %>%
+    filter(in_ipa == "no") %>%
+    left_join(avsi_hiring, by = "coachid") %>%
+    filter(hired_after_2018 == "Yes" & dropped == "No") %>%
+    select(coachid, `Village Cluster.y`) %>%
+    print(n=Inf)
+```
+12/49 coaches only in the AVSI file have no hiring data. **Why??**
+
+```{r}
+  combined %>%
+    filter(in_ipa == "no") %>%
+    left_join(avsi_hiring, by = "coachid") %>%
+    filter(is.na(hired_after_2018)) %>%
+    select(coachid, `Village Cluster.y`)
+```
+
+## Coaches only in the IPA file
+
+The following 38 coaches are only present in the IPA file:
+
+```{r}
+  combined %>%
+    filter(in_avsi == "no") %>%
+    select(coachid, `Village Cluster.x`) %>%
+    print(n=Inf)
+```
+20/38 coaches have hiring information:
+
+```{r}
+  combined %>%
+    filter(in_avsi == "no") %>%
+    left_join(avsi_hiring, by = "coachid") %>%
+    filter(!is.na(hired_after_2018)) %>%
+    select(coachid, `Village Cluster.x`, start, end, dropped)
+```
+13/20 with hiring data did not remain in the coaching role through the end of Cohort 1.
+
+```{r}
+  combined %>%
+    filter(in_avsi == "no") %>%
+    left_join(avsi_hiring, by = "coachid") %>%
+    filter(!is.na(hired_after_2018)) %>%
+    group_by(dropped) %>%
+    count()
+```
+Here is the full disposition of coaches across both IPA and AVSI's files:
+
+```{r}
+  combined %>%
+    left_join(avsi_hiring, by = "coachid") %>%
+    group_by(in_avsi, in_ipa, hired_after_2018, dropped) %>%
+    count()
+```
+
+
+# How was compliance among the matches?
+
+145 coaches present in both files were hired in 2018 and remained in the coaching role through the end of Cohort 1.
+
+```{r}
+  combined %>%
+    left_join(avsi_hiring, by = "coachid") %>%
+    filter(in_avsi=="yes", in_ipa=="yes", 
+           hired_after_2018=="No", dropped=="No") %>%
+    mutate(match_cluster = case_when(
+      `Village Cluster.x` == `Village Cluster.y` ~ "Yes",
+      TRUE ~ "No"
+    )) %>%
+    group_by(match_cluster) %>%
+    count()
+```
+
+117/145 (80%) of these matching coaches appear to have served in their originally assigned village clusters. Here are the non-matching cluster coaches:
+
+```{r}
+  combined %>%
+    left_join(avsi_hiring, by = "coachid") %>%
+    filter(in_avsi=="yes", in_ipa=="yes", 
+           hired_after_2018=="No", dropped=="No") %>%
+    mutate(match_cluster = case_when(
+      `Village Cluster.x` == `Village Cluster.y` ~ "Yes",
+      TRUE ~ "No"
+    )) %>%
+    filter(match_cluster=="No") %>%
+    select(coachid, `Village Cluster.x`, `Village Cluster.y`) %>%
+    print(n=Inf)
+```
+
+# Outstanding Questions
+
+1. We thought IPA randomized 194 coaches. The Jan 2019 files list 193 coaches by our count. Is a coach missing?
+
+2. We count 266 groups in the AVSI file vs 265 groups in the IPA file. The IPA file does not contain group numbers, so we can't identify which group is potentially missing.
+
+3. 49 coach IDs only appear in the AVSI file:
+
+  * 10/49 coaches were hired in 2018. 9/10 remained employed through the end of Cohort 1; 1/10 terminated before 2019. Why are these 9 coaches not in the IPA file? 
+  
+  * 27/49 coaches only in the AVSI file were hired after 2018 and remained in the program until the end of Cohort 1. Were these replacements coaches?
+
+  * 12/49 coaches only in the AVSI file have no hiring data. Why?
+
+4. 38 coaches IDs only appear in the IPA file:
+
+  * 20/38 coaches have hiring information
+
+    * 13/20 with hiring data did not remain in the coaching role through the end of Cohort 1.
+
+```{r, include=FALSE}
+  out <- combined %>%
+    left_join(avsi_hiring, by = "coachid") %>%
+    select(-red) %>%
+    mutate(match_cluster = case_when(
+      `Village Cluster.x` == `Village Cluster.y` ~ "Yes",
+      TRUE ~ "No"
+    )) %>%
+    mutate(in_both = case_when(
+      in_avsi == "yes" & in_ipa == "yes" ~ "yes",
       TRUE ~ "no"
     )) %>%
-    group_by(same_vc) %>% count() %>%
-    ungroup() %>% mutate(N = sum(n))
-```
-# Coach IDs in IPA but not AVSI
+    arrange(desc(in_both), desc(match_cluster), desc(in_ipa), desc(in_avsi)) %>%
+    select(coachid, in_both, everything())
 
-```{r}
-  ipa_not_avsi <- combined %>%
-    filter(in_ipa == "yes" & in_avsi == "no") %>%
-    distinct(coachid) 
+  writexl::write_xlsx(out, path = paste0(path, "combined.xlsx"))
+```   
 
-  avsi_not_ipa <- combined %>%
-    filter(in_ipa == "no" & in_avsi == "yes") %>%
-    distinct(coachid) 
-  
-  writexl::write_xlsx(list(ipa_not_avsi = ipa_not_avsi, 
-                           avsi_not_ipa = avsi_not_ipa), 
-                      path = "assignment-checks.xlsx")
-```
 
-# Multiple coaches per arm per village
-
-Antoine notices that some clusters have multiple coaches in a given arm:
-
-```{r}
-  avsi %>%
-    group_by(`Village Cluster`, `HH Arm`) %>%
-    count(name = "number coaches") %>%
-    filter(`number coaches`>1) %>%
-    left_join(select(avsi, `Village Cluster`, `HH Arm`)) %>%
-    distinct(`Village Cluster`, `HH Arm`, .keep_all = TRUE)
-```
-
-I think the issue here is that some village clusters have more than one group in arm 1, more than 1 group in arm 2, etc.
-
-```{r}
-  ipa %>% 
-    mutate(treat = tolower(treat)) %>%
-    group_by(vil_clus, treat) %>% 
-    count(name = "number of groups") %>% 
-    filter(`number of groups`>1)
-```
-
-Confirming that group IDs do not repeat in clusters:
-
-```{r}
-  avsi %>%
-    group_by(`Village Cluster`, `Group ID`) %>%
-    count() %>%
-    filter(n>1) %>%
-    left_join(select(avsi, `Village Cluster`, `HH Arm`, `Coach ID`, `Group ID`))
-```

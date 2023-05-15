@@ -1240,7 +1240,7 @@ from the function help:
 
 # To Do
 
--   Determine the extent to which coach randomization was broken
--   Incorporate baseline data into the model
--   Set up an analysis to estimate how coach effects vary by
-    pre-treatment severity
+- Determine the extent to which coach randomization was broken
+- Incorporate baseline data into the model
+- Set up an analysis to estimate how coach effects vary by pre-treatment
+  severity

@@ -167,13 +167,40 @@ After the timer expires, switch roles and topics.
 countdown(minutes = 4, seconds = 00)
 ```
 
+## Notetaking and Memoing
+
+::: columns
+::: {.column width="50%"}
+
+### [Notes]{style="color:#F4BA02"}
+
+* What you write *in* the moment
+* You need to take notes, even if you have permission to record an interview
+* Use shorthand, technology
+:::
+
+::: {.column width="50%"}
+
+### [Memos]{style="color:#F4BA02"}
+
+* What you write *after* the moment
+* Memos are data
+* Your observations, your questions
+:::
+:::
+
+
+## Example Memo {.scrollable}
+
+![](img/memo.png){height=1500}
+
+## Qualitative Data Analysis
+
+* Beyond today's scope, but look into software to assist with thematic coding, such as[NVIVO](https://lumivero.com/products/nvivo/){preview-link="true"}, [ATLAS.ti](https://atlasti.com/){preview-link="true"} and [Dedoose](https://www.dedoose.com/){preview-link="true"}
+* Can also use [R for text mining](https://gatesopenresearch.s3.eu-west-1.amazonaws.com/manuscripts/14107/dd817e20-3463-415f-bf6e-83cf3aae5243_12999_-_eric_green.pdf?doi=10.12688/gatesopenres.12999.1&numberOfBrowsableCollections=4&numberOfBrowsableInstitutionalCollections=0&numberOfBrowsableGateways=9){preview-link="true"}
+* Large language models like [chatGPT](https://chat.openai.com/) are poised to disrupt QDA. They won't replace the thinking analyst, but LLMs will quicky find patterns and themes and let analysts work more efficiently and focus on the parts that humans still do best
 
 # [Focus Groups]{style="color:white; font-size:200%;"} {background="linear-gradient(0deg, #006db0, #008a2e)"}
 
 # [Direct Observation]{style="color:white; font-size:200%;"} {background="linear-gradient(0deg, #006db0, #008a2e)"}
-
-## Your Turn 1
-
-Something
-
 

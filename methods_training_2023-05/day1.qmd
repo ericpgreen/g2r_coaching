@@ -1,0 +1,78 @@
+---
+title: "2023 Methods Training"
+subtitle: "Day 1: Qualitative and Observational Data Collection"
+author:
+  - Eric Green
+  - Eve Puffer
+format: 
+  revealjs:
+    multiplex: true
+    theme: [custom.scss]
+    slide-number: c/t
+    incremental: true
+    title-slide-attributes:
+      data-background-image: /img/title.png
+      data-background-size: contain
+      data-background-opacity: "1"
+---
+
+```{r}
+library(countdown)
+```
+
+
+## {background-image="img/FallMini2022-11.jpg"}
+
+## Today's Agenda
+
+::: {.columns}
+::: {.column  width="90%"}
+
+| Time | Topic |
+|-----------|:-----|
+| 2:00-2:15 | Introduction |
+| 2:15-3:00 | Interviews and memos |
+| 3:00-3:15 | ☕️ Coffee/tea break |
+| 3:15-4:00 | Focus groups |
+| 4:00-4:15 | ☕️ Coffee/tea break |
+| 4:15-5:00 | Direct observational methods |
+
+:::
+:::
+
+## Previewing Tomorrow
+
+::: {.columns}
+::: {.column  width="90%"}
+
+| Time | Topic |
+|-----------|:-----|
+| 2:00-3:00 | Data visualization and thinking about data |
+| 3:00-3:15 | ☕️ Coffee/tea break |
+| 3:15-4:00 | Data Wrangling |
+| 4:00-4:15 | ☕️ Coffee/tea break |
+| 4:15-5:00 | Reproducible reporting |
+
+:::
+:::
+
+# [Interviews]{style="color:white; font-size:200%;"} { background="linear-gradient(0deg, #006db0, #008a2e)"}
+
+## 
+
+
+# [Focus Groups]{style="color:white; font-size:200%;"} { background="linear-gradient(0deg, #006db0, #008a2e)"}
+
+
+
+# [Direct Observation]{style="color:white; font-size:200%;"} { background="linear-gradient(0deg, #006db0, #008a2e)"}
+
+
+
+## Your Turn 1
+
+Something
+
+```{r}
+countdown(minutes = 5, seconds = 00)
+```

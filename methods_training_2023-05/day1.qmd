@@ -275,7 +275,7 @@ countdown(minutes = 15, seconds = 00)
 
 ## Your Turn 2
 
-Let's go a mini free listing and card sorting exercise to get a feel for the method.
+Let's do a mini free listing and card sorting exercise to get a feel for the method.
 
 ```{r}
 countdown(minutes = 5, seconds = 00)

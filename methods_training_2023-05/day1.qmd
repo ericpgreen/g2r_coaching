@@ -16,7 +16,7 @@ format:
       data-background-opacity: "1"
 ---
 
-```{r}
+```{r, include=FALSE}
 library(countdown)
 ```
 
@@ -102,6 +102,12 @@ Available for 1-on-1s or small group consultation
 
 # [Interviews]{style="color:white; font-size:200%;"} {background="linear-gradient(0deg, #006db0, #008a2e)"}
 
+## Know Your Role
+
+* The interviewer is the student, and the person being interviewed is the expert
+* The goal is for the student to learn as much as the expert is willing to share about a topic
+*T he student poses open-ended questions, listens attentively, and probes to gain understanding
+
 ## {background-image="img/christina-wocintechchat-com-LQ1t-8Ms5PY-unsplash.jpg"}
 
 <center>
@@ -128,11 +134,7 @@ Available for 1-on-1s or small group consultation
 
 ## Spot the Good Interview
 
-::: {.no-margin-img}
-
 ![](img/interview.png)
-
-:::
 
 ## Hot Seat 🔥
 

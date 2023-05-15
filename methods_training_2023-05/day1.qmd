@@ -155,7 +155,7 @@ I need a topic and a volunteer willing to be interviewed by yours truly.
 
 : {tbl-colwidths="[50,50]"}
 
-## Your Turn
+## Your Turn 1
 
 Find a partner (ideally not someone who knows everything about you already).
 
@@ -199,6 +199,12 @@ countdown(minutes = 4, seconds = 00)
 * Beyond today's scope, but look into software to assist with thematic coding, such as [NVIVO](https://lumivero.com/products/nvivo/){preview-link="true"}, [ATLAS.ti](https://atlasti.com/){preview-link="true"} and [Dedoose](https://www.dedoose.com/){preview-link="true"}
 * Can also use [R for text mining](https://gatesopenresearch.s3.eu-west-1.amazonaws.com/manuscripts/14107/dd817e20-3463-415f-bf6e-83cf3aae5243_12999_-_eric_green.pdf?doi=10.12688/gatesopenres.12999.1&numberOfBrowsableCollections=4&numberOfBrowsableInstitutionalCollections=0&numberOfBrowsableGateways=9){preview-link="true"}
 * Large language models like [chatGPT](https://chat.openai.com/) are poised to disrupt QDA. They won't replace the thinking analyst, but LLMs will quicky find patterns and themes and let analysts work more efficiently and focus on the parts that humans still do best
+
+## ☕️ Coffee/tea break
+
+```{r}
+countdown(minutes = 15, seconds = 00)
+```
 
 # [Focus Groups]{style="color:white; font-size:200%;"} {background="linear-gradient(0deg, #006db0, #008a2e)"}
 
@@ -267,6 +273,15 @@ countdown(minutes = 4, seconds = 00)
 
 ![](img/flcs6.png)
 
+## Your Turn 2
+
+Let's go a mini free listing and card sorting exercise to get a feel for the method.
+
+```{r}
+countdown(minutes = 5, seconds = 00)
+```
+
+
 ## G2R Free Listing/Sorting
 
 * We conducted 8 focus groups with 38 randomly selected coaches and participants to elicit perspectives on [how coaches contribute to participant success]{style="color: white; background-color:rgba(6, 115, 177, 0.6)"}
@@ -279,6 +294,19 @@ countdown(minutes = 4, seconds = 00)
 * [We removed 26 duplicate cards within groups and then collapsed similar terms across groups for a total of 32 unique cover terms.]{style="color: white; background-color:rgba(6, 115, 177, 0.8)"}
 * [We then scored each cover term based on the rankings across groups and created the overall ranking by group type.]{style="color: white; background-color:rgba(6, 115, 177, 0.8)"}
 
+## Jump to Google Sheets
+
+## 
+
+![](img/flcs_slope.png)
+## 
+
+![](img/flcs_scoring.png)
+## ☕️ Coffee/tea break
+
+```{r}
+countdown(minutes = 15, seconds = 00)
+```
 
 # [Direct Observation]{style="color:white; font-size:200%;"} {background="linear-gradient(0deg, #006db0, #008a2e)"}
 

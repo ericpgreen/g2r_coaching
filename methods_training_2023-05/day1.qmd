@@ -20,54 +20,83 @@ format:
 library(countdown)
 ```
 
-
-## {background-image="img/FallMini2022-11.jpg"}
+##  {background-image="img/FallMini2022-11.jpg"}
 
 ## Today's Agenda
 
-::: {.columns}
-::: {.column  width="90%"}
-
-| Time | Topic |
-|-----------|:-----|
-| 2:00-2:15 | Introduction |
-| 2:15-3:00 | Interviews and memos |
-| 3:00-3:15 | ☕️ Coffee/tea break |
-| 3:15-4:00 | Focus groups |
-| 4:00-4:15 | ☕️ Coffee/tea break |
+::: columns
+::: {.column width="90%"}
+| Time      | Topic                        |
+|-----------|:-----------------------------|
+| 1:00-2:00 | Lunch 🥘                     |
+| 2:00-2:15 | Introduction                 |
+| 2:15-3:00 | Interviews and memos         |
+| 3:00-3:15 | ☕️ Coffee/tea break          |
+| 3:15-4:00 | Focus groups                 |
+| 4:00-4:15 | ☕️ Coffee/tea break          |
 | 4:15-5:00 | Direct observational methods |
-
 :::
 :::
 
-## Previewing Tomorrow
+## Previewing Tomorrow 👀
 
-::: {.columns}
-::: {.column  width="90%"}
-
-| Time | Topic |
-|-----------|:-----|
+::: columns
+::: {.column width="90%"}
+| Time      | Topic                                      |
+|-----------|:-------------------------------------------|
+| 1:00-2:00 | Lunch 🥘                                   |
 | 2:00-3:00 | Data visualization and thinking about data |
-| 3:00-3:15 | ☕️ Coffee/tea break |
-| 3:15-4:00 | Data Wrangling |
-| 4:00-4:15 | ☕️ Coffee/tea break |
-| 4:15-5:00 | Reproducible reporting |
-
+| 3:00-3:15 | ☕️ Coffee/tea break                        |
+| 3:15-4:00 | Data Wrangling                             |
+| 4:00-4:15 | ☕️ Coffee/tea break                        |
+| 4:15-5:00 | Reproducible reporting                     |
 :::
 :::
 
-# [Interviews]{style="color:white; font-size:200%;"} { background="linear-gradient(0deg, #006db0, #008a2e)"}
+## Thursday 🤝
+
+Available for 1-on-1s or small group consultation
+
+# [Qualitative Methods]{style="color:white; font-size:200%;"} {background="linear-gradient(0deg, #006db0, #008a2e)"}
+
+## Goal of Qualitative Inquiry
+
+<br>
+
+<center>[To gain a [**deep, contextual**]{style="background-color:rgba(0, 139, 47, 0.3)"} understanding of an issue from the perspective of those involved or affected]{style="font-size:200%;"}</center>
+
+## [Qual]{style="background-color:rgba(6, 115, 177, 0.3)"}itative [VS]{style="text-decoration: underline;"} [Quant]{style="background-color:rgba(0, 139, 47, 0.3)"}itative
+
+
+| Qualitative | Quantitative |
+|-------------|:-------------|
+| To describe variation | To quantify variation |
+| Prioritizes depth | (Often) prioritizes breadth |
+| Answers why/how | Answers how much/many |
+| To test hypotheses | To develop hypotheses |
+| Highly flexible | Often rigid, standardized |
+| Textual | Numeric |
+
+: {tbl-colwidths="[50,50]"}
+
+## [Qual]{style="background-color:rgba(6, 115, 177, 0.3)"}itative [AND]{style="text-decoration: underline;"} [Quant]{style="background-color:rgba(0, 139, 47, 0.3)"}itative
+
+
+| Order | Description |
+|-------------|:-------------|
+| Qual ︎➡️ Quant | Measure development then validation, hypothesis generation then testing (Exploratory Sequential) |
+| Quant ➡️ Qual | Collect qualitative data to better understand quantitative results (Explanatory Sequential) 
+| Quant 🔁 Qual | Collect and analyze both types of data simultaneously and look for convergence (Convergent) |
+
+: {tbl-colwidths="[30,70]"}
+
+# [Interviews]{style="color:white; font-size:200%;"} {background="linear-gradient(0deg, #006db0, #008a2e)"}
 
 ## 
 
+# [Focus Groups]{style="color:white; font-size:200%;"} {background="linear-gradient(0deg, #006db0, #008a2e)"}
 
-# [Focus Groups]{style="color:white; font-size:200%;"} { background="linear-gradient(0deg, #006db0, #008a2e)"}
-
-
-
-# [Direct Observation]{style="color:white; font-size:200%;"} { background="linear-gradient(0deg, #006db0, #008a2e)"}
-
-
+# [Direct Observation]{style="color:white; font-size:200%;"} {background="linear-gradient(0deg, #006db0, #008a2e)"}
 
 ## Your Turn 1
 

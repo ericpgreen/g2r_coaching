@@ -30,7 +30,7 @@ library(countdown)
 |-----------|:-----------------------------|
 | 1:00-2:00 | Lunch 🥘                     |
 | 2:00-2:15 | Introduction                 |
-| 2:15-3:00 | Interviews and memos         |
+| 2:15-3:00 | Interviews         |
 | 3:00-3:15 | ☕️ Coffee/tea break          |
 | 3:15-4:00 | Focus groups                 |
 | 4:00-4:15 | ☕️ Coffee/tea break          |
@@ -196,11 +196,50 @@ countdown(minutes = 4, seconds = 00)
 
 ## Qualitative Data Analysis
 
-* Beyond today's scope, but look into software to assist with thematic coding, such as[NVIVO](https://lumivero.com/products/nvivo/){preview-link="true"}, [ATLAS.ti](https://atlasti.com/){preview-link="true"} and [Dedoose](https://www.dedoose.com/){preview-link="true"}
+* Beyond today's scope, but look into software to assist with thematic coding, such as [NVIVO](https://lumivero.com/products/nvivo/){preview-link="true"}, [ATLAS.ti](https://atlasti.com/){preview-link="true"} and [Dedoose](https://www.dedoose.com/){preview-link="true"}
 * Can also use [R for text mining](https://gatesopenresearch.s3.eu-west-1.amazonaws.com/manuscripts/14107/dd817e20-3463-415f-bf6e-83cf3aae5243_12999_-_eric_green.pdf?doi=10.12688/gatesopenres.12999.1&numberOfBrowsableCollections=4&numberOfBrowsableInstitutionalCollections=0&numberOfBrowsableGateways=9){preview-link="true"}
 * Large language models like [chatGPT](https://chat.openai.com/) are poised to disrupt QDA. They won't replace the thinking analyst, but LLMs will quicky find patterns and themes and let analysts work more efficiently and focus on the parts that humans still do best
 
 # [Focus Groups]{style="color:white; font-size:200%;"} {background="linear-gradient(0deg, #006db0, #008a2e)"}
+
+## Strengths of Each Method
+
+| Interviews | Focus Groups |
+|-------------|:-------------|
+| Obtain personal narratives | Identify group norms |
+| Good for sensitive topics | Get opinions about group norms |
+| In-depth exploration | Probe differences in perspectives |
+
+
+: {tbl-colwidths="[50,50]"}
+
+## You Need
+
+* Usually at least two facilitators: moderator and note taker
+* ~6-12 participants
+* Audio, maybe video recording
+* Demographic sheet with ID numbers linked to table top cards with the same ID numbers (for identifying speakers in your notes)
+* A private space
+* Ground rules and a flexible moderator who encourages wide participation
+
+## {background-image="img/hancindex.jpg"}
+
+<br>
+<br>
+<br>
+<br>
+<center>
+
+[**Many Formats**]{style="font-size:150%;color:white;"}
+
+* [group discussion]{style="color: white; background-color:rgba(6, 115, 177, 0.6);font-size:120%"}
+* [dial testing]{style="color: white; background-color:rgba(6, 115, 177, 0.6);font-size:120%"}
+* [photovoice]{style="color: white; background-color:rgba(6, 115, 177, 0.6);font-size:120%"}
+* [free listing/card sorting]{style="color: white; background-color:rgba(6, 115, 177, 0.6);font-size:120%"}
+
+</center>
+
+## {background-video="https://vimeo.com/11066260#t=170s"}
 
 # [Direct Observation]{style="color:white; font-size:200%;"} {background="linear-gradient(0deg, #006db0, #008a2e)"}
 

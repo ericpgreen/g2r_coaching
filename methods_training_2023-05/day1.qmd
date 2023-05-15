@@ -239,7 +239,46 @@ countdown(minutes = 4, seconds = 00)
 
 </center>
 
-## {background-video="https://vimeo.com/11066260#t=170s"}
+## 
+
+{{< video https://vimeo.com/11066260 width="100%" height="100%">}}
+
+## 
+
+![](img/flcs1.png)
+
+## 
+
+![](img/flcs2.png)
+
+## 
+
+![](img/flcs3.png)
+
+## 
+
+![](img/flcs4.png)
+
+## 
+
+![](img/flcs5.png)
+
+## 
+
+![](img/flcs6.png)
+
+## G2R Free Listing/Sorting
+
+* We conducted 8 focus groups with 38 randomly selected coaches and participants to elicit perspectives on [how coaches contribute to participant success]{style="color: white; background-color:rgba(6, 115, 177, 0.6)"}
+* In the free-listing portion, we asked discussion participants to list all of the characteristics of coaches—and facets of coaching—that they think are important, and the co-facilitator documented these ideas on individual index cards.
+* After free listing, the facilitator asked the group to sort the cards in order of importance. 
+
+## {background-image="img/g2r_flcs.png"}
+
+* [The 8 groups free-listed 137 cards, 17.1 cards per group on average.]{style="color: white; background-color:rgba(6, 115, 177, 0.8)"}
+* [We removed 26 duplicate cards within groups and then collapsed similar terms across groups for a total of 32 unique cover terms.]{style="color: white; background-color:rgba(6, 115, 177, 0.8)"}
+* [We then scored each cover term based on the rankings across groups and created the overall ranking by group type.]{style="color: white; background-color:rgba(6, 115, 177, 0.8)"}
+
 
 # [Direct Observation]{style="color:white; font-size:200%;"} {background="linear-gradient(0deg, #006db0, #008a2e)"}
 

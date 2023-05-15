@@ -296,12 +296,18 @@ countdown(minutes = 5, seconds = 00)
 
 ## Jump to Google Sheets
 
-## 
-
-![](img/flcs_slope.png)
-## 
+## Qual to Quant
 
 ![](img/flcs_scoring.png)
+
+## Group Analysis
+
+![](img/flcs_slope.png)
+
+## Created Survey Items
+
+![](img/flcs_survey.png)
+
 ## ☕️ Coffee/tea break
 
 ```{r}

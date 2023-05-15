@@ -79,3 +79,8 @@ $selectionColor: #fff;
 #title-slide > .author:first-of-type {
   margin-top: 250px;
 }
+
+.no-margin-img .reveal img {
+  margin-left: 0px;
+  margin-right: 0px;
+}

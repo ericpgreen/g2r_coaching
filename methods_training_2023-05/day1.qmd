@@ -90,9 +90,68 @@ Available for 1-on-1s or small group consultation
 
 : {tbl-colwidths="[30,70]"}
 
+## Methods
+
+| Method | Best For |
+|-------------|:-------------|
+| Interviews | Collecting personal narratives and perspectives, understanding sensitive topics |
+| Focus groups | Understanding group norms, competing perspectives | 
+| Participant observation | Observing naturally occurring behavior in context |
+
+: {tbl-colwidths="[30,70]"}
+
 # [Interviews]{style="color:white; font-size:200%;"} {background="linear-gradient(0deg, #006db0, #008a2e)"}
 
-## 
+## {background-image="img/christina-wocintechchat-com-LQ1t-8Ms5PY-unsplash.jpg"}
+
+<center>
+
+[**Key skills**]{style="font-size:200%;"}
+
+* [rapport building]{style="color: white; background-color:rgba(6, 115, 177, 0.6);font-size:120%"}
+* [emphasize other perspective]{style="color: white; background-color:rgba(6, 115, 177, 0.6);font-size:120%"}
+* [adapt to personality/state]{style="color: white; background-color:rgba(6, 115, 177, 0.6);font-size:120%"}
+* [active listening]{style="color: white; background-color:rgba(6, 115, 177, 0.6);font-size:120%"}
+
+</center>
+
+## Active Listening
+
+| Direct Probes | Indirect Probes |
+|-------------|:-------------|
+| Can you say more about that? | Verbal expressions: uh huh, ok, i see |
+| I'm not sure I understand. Can you explain? | Restatement: "So you are saying that…" |
+| Can you give me an example? | Reflection: "And that made you feel…" |
+| Why do you think..."? | Non-verbal gestures such as nodding |
+
+: {tbl-colwidths="[50,50]"}
+
+## Spot the Good Interview
+
+::: {.no-margin-img}
+
+![](img/interview.png)
+
+:::
+
+## Hot Seat 🔥
+
+For me, not you. I need a topic and a volunteer willing to be interviewed by yours truly. 
+
+**Audience:** Please listen and label each direct and indirect probe I use.
+
+## Your Turn
+
+Find a partner (ideally not someone who knows everything about you already).
+
+In the first 4-min block you will interview your partner about [topic]. Don't take notes.
+
+After the timer expires, switch roles and topics.
+
+```{r}
+countdown(minutes = 4, seconds = 00)
+```
+
 
 # [Focus Groups]{style="color:white; font-size:200%;"} {background="linear-gradient(0deg, #006db0, #008a2e)"}
 
@@ -102,6 +161,4 @@ Available for 1-on-1s or small group consultation
 
 Something
 
-```{r}
-countdown(minutes = 5, seconds = 00)
-```
+

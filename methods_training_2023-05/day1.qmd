@@ -484,7 +484,7 @@ IDEO, [*The Field Guide to Human-Centered Design*](https://www.designkit.org/res
 ## Homework
 
 ::: columns
-::: {.column width="50%"}
+::: {.column width="33.3%"}
 
 <center>
 Sign up for a [Posit Cloud Free account](https://ghr.link/g2r-cloud) and join our workspace
@@ -496,15 +496,24 @@ ghr.link/g2r-cloud
 </center>
 :::
 
-::: {.column width="50%"}
+::: {.column width="33.3%"}
 <center>
-Follow [these instructions](https://posit.co/download/rstudio-desktop/) to download/install R and RStudio (in that order)
+Follow [these instructions](https://posit.co/download/rstudio-desktop/) to download/install R and RStudio
 
 ![](img/rsd.png)
 <br>
 ghr.link/rsd
 </center>
 :::
-:::
+::: {.column width="33.3%"}
+<center>
+[Today's slide deck](https://tinyurl.com/avsiday1) 
+(gives you easy access to these links)
 
-Today's Slides: [tinyurl.com/avsiday1](https://tinyurl.com/avsiday1)
+
+![](img/amt1.png)
+<br>
+tinyurl.com/avsiday1
+</center>
+:::
+:::

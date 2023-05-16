@@ -68,7 +68,7 @@ Available for 1-on-1s or small group consultation
 
 <br>
 
-<center>[To gain a [**deep, contextual**]{style="background-color:rgba(0, 139, 47, 0.3)"} understanding of an issue from the perspective of those involved or affected]{style="font-size:200%;"}</center>
+<center>[To gain a [**deep, contextual**]{style="background-color:rgba(6, 115, 177, 0.3)"} understanding of an issue from the perspective of those involved or affected]{style="font-size:200%;"}</center>
 
 ## [Qual]{style="background-color:rgba(6, 115, 177, 0.3)"}itative [VS]{style="text-decoration: underline;"} [Quant]{style="background-color:rgba(0, 139, 47, 0.3)"}itative
 
@@ -506,3 +506,5 @@ ghr.link/rsd
 </center>
 :::
 :::
+
+Today's Slides: [tinyurl.com/avsiday1](https://tinyurl.com/avsiday1)

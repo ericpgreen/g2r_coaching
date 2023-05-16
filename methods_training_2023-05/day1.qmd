@@ -316,3 +316,161 @@ countdown(minutes = 15, seconds = 00)
 
 # [Direct Observation]{style="color:white; font-size:200%;"} {background="linear-gradient(0deg, #006db0, #008a2e)"}
 
+## ⚠️ This Not Participant Observation
+
+Today we'll talk about direct observation which sounds similar to a third qualitative data collection method called participant observation.
+
+Participant observation is a time-consuming enthnographic technique where the goal is to learn the perspectives and behaviors of a target population through observation and interaction.
+
+The goal of [direct observation]{style="text-decoration: underline;"} is to [quantify or rate the observable behaviors]{style="color: white; background-color:rgba(6, 115, 177, 0.6);"} of a target population.
+
+## Observational Measures
+
+Often considered a "gold standard" measure of behavior because:
+
+(1) it reduces bias present in methods where someone reports on their own behavior; and 
+(2) allows for a more detailed understanding of how, when, and why a behavior occurs.
+
+## Observational Measures
+
+Can be used for: 
+
+* Descriptive research (to understand an issue)
+* **Intervention research** (to document the process and outcomes)
+  * How was the intervention delivered? (fidelity, competency) 
+  * What was the outcome of the intervention?
+
+# [How was the Intervention [Delivered]{style="color: white; background-color:rgba(6, 115, 177, 0.6);"}?]{style="color:white; font-size:125%;"} {background-color="#006db0"}
+
+## Fidelity
+
+**Key question:** Was the intervention delivered like it was designed/intended?^[Can ask for self-report, which is then not observational; having a separate observer is much more valid; a selection of sessions can be observed rather than all.]
+
+*Example:* Did coaches follow the manual?
+
+<center>
+![](img/fidelityex.png)
+</center>
+
+## Competency
+
+**Key question:** How skillfully did providers deliver the intervention?
+
+*Example:* Did coaches use effective strategies when doing the steps?
+
+Example measure: Competency rating tool
+
+In a survey, we can multiple choice questions to ask for ratings (e.g., Not at all, A Little, Very).
+
+In an [observational measure]{style="text-decoration: underline;"}, judgments are [based on watching/listening to delivery]{style="text-decoration: underline;"} (live or recorded). The measure tells you which behaviors to look and listen for. 
+
+## Your Turn 3
+
+**If you were observing a group coaching session, what would you be watching for to see if the coach was a skillful, effective coach?**
+
+*Ask yourself:* What should the coach be doing? HOW should the 
+coach be acting towards the participants? 
+
+In pairs, generate 3 behaviors you would watch for. Share with group to generate a list.
+
+```{r}
+countdown(minutes = 4, seconds = 00)
+```
+
+## Adaptation of Competency Tools for Coaching
+
+Clinical competency tools exist for psychosocial interventions, primarily interventions focused on mental health.^[See [EQUIP Platform](https://equipcompetency.org/en-gb){preview-link="true"} for some widely used tools.]
+
+We started a [draft competency tool for coaching](https://docs.google.com/document/d/1YrzEp0m-pu1l8_mnYeDZeBbG06FijQ5mDmp2cWj54eE/edit?usp=sharing){preview-link="true"}, adapting from existing competency tools. We can now tailor them further based on research results.
+
+##
+
+![](img/comp_item1.png)
+
+##
+
+![](img/comp_item2.png)
+
+
+##
+
+![](img/comp_item5.png)
+
+
+##
+
+![](img/comp_item9.png)
+
+
+# [What was the Outcome of the Intervention?]{style="color:white; font-size:125%;"} {background-color="#006db0"}
+
+## Direct Observation of Outcomes
+
+| Target | Example |
+|-------------|:-------------|
+| Individual Behavior | child’s classroom behavior (e.g., track how many times they talk without permission) |
+| Interactions | parent-child interactions, family interactions |
+
+: {tbl-colwidths="[30,70]"}
+
+## Direct Observation of Outcomes
+
+### Methods: 
+
+* **Naturalistic** (watching/recording in the natural environment, e.g., home or school)
+* **Structured, standardized activities** as part of an assessment
+  * Give participants a standardized prompt while watching or recording
+  * Count or describe specific behaviors
+
+## Example: Parent-Child Interactions
+
+**Setting:** Parenting intervention evaluation in Liberia
+
+**Setup:** A square on the ground using pieces of rope and locally-available materials that children commonly play with (rocks, paper, pencils/crayons, bottles, boxes). Tablets used to record 5-min video interaction. 
+
+**Prompt:** "Let child be free in the play and follow along with what your child wants to do."
+
+**Rated from recording:** (1) Level of Activity/Interaction, (2) Parent Praising the child, (3) Positive Child Reactions, (4) Child Verbalizations
+
+## Your Turn 4
+
+**What would you hypothesize are family relationship outcomes of G2R?** 
+
+::: {.nonincremental}
+* If you were watching the family interact after G2R, what would you be watching and listening for to see if that outcome was achieved?
+
+* What type of standardized activity or prompt could you ask them to do in order to assess whether the interaction outcome was achieved? 
+:::
+
+[Discuss in pairs; Share idea with group]
+
+```{r}
+countdown(minutes = 5, seconds = 00)
+```
+
+## Example: Family Interactions
+
+**Setting:** Family therapy intervention [evaluation](https://doi.org/10.1016/j.beth.2018.08.004){preview-link="true"} in Kenya
+
+::: {.nonincremental}
+Structured family activities (video recorded; 10 min each):
+
+* Hands-on problem-solving task ("house" building)
+* Family discussion prompt about hopes
+* Couples conflict discussion prompt
+
+We rated:
+
+* Global Codes across activities (e.g., positive behavior, negative behavior)
+* Activity-specific codes (e.g., ability to clarify a problem/hope, extent of reaching a solution)
+:::
+
+# [Thank You! 🙏]{style="color:white; font-size:125%;"} {background="linear-gradient(0deg, #006db0, #008a2e)"}
+
+## Resources
+
+FHI360, [*Qualitative Research Methods: A Data Collector's Field Guide*](https://www.fhi360.org/sites/default/files/media/documents/Qualitative%20Research%20Methods%20-%20A%20Data%20Collector's%20Field%20Guide.pdf)
+
+IDEO, [*Design Kit*](https://www.designkit.org/)
+
+IDEO, [*The Field Guide to Human-Centered Design*](https://www.designkit.org/resources/1.html)

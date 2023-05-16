@@ -474,3 +474,29 @@ FHI360, [*Qualitative Research Methods: A Data Collector's Field Guide*](https:/
 IDEO, [*Design Kit*](https://www.designkit.org/)
 
 IDEO, [*The Field Guide to Human-Centered Design*](https://www.designkit.org/resources/1.html)
+
+## Homework
+
+::: columns
+::: {.column width="50%"}
+
+<center>
+Sign up for a [Posit Cloud Free account](https://posit.cloud/plans/free)
+<br>
+
+![](img/posit.png)
+<br>
+ghr.link/pcf
+</center>
+:::
+
+::: {.column width="50%"}
+<center>
+Follow [these instructions](https://posit.co/download/rstudio-desktop/) to download/install R and RStudio
+
+![](img/rsd.png)
+<br>
+ghr.link/rsd
+</center>
+:::
+:::

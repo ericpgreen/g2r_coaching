@@ -78,7 +78,7 @@ Available for 1-on-1s or small group consultation
 | To describe variation | To quantify variation |
 | Prioritizes depth | (Often) prioritizes breadth |
 | Answers why/how | Answers how much/many |
-| To test hypotheses | To develop hypotheses |
+| To develop hypotheses | To test hypotheses |
 | Highly flexible | Often rigid, standardized |
 | Textual | Numeric |
 
@@ -162,14 +162,19 @@ I need a topic and a volunteer willing to be interviewed by yours truly.
 
 ## Your Turn 1
 
-Find a partner (ideally not someone who knows everything about you already).
+Find a partner and interview your partner about [topic]. Don't take notes. After the timer expires, switch roles and topics.
 
-In the first 4-min block you will interview your partner about [topic]. Don't take notes.
+| Direct Probes | Indirect Probes |
+|-------------|:-------------|
+| Can you say more about that? | Verbal expressions: uh huh, ok, i see |
+| I'm not sure I understand. Can you explain? | Restatement: "So you are saying that…" |
+| Can you give me an example? | Reflection: "And that made you feel…" |
+| Why do you think..."? | Non-verbal gestures such as nodding |
 
-After the timer expires, switch roles and topics.
+: {tbl-colwidths="[50,50]"}
 
 ```{r}
-countdown(minutes = 4, seconds = 00)
+countdown(minutes = 4, seconds = 00, top = 0)
 ```
 
 ## Notetaking and Memoing
@@ -206,6 +211,10 @@ countdown(minutes = 4, seconds = 00)
 * Large language models like [chatGPT](https://chat.openai.com/) are poised to disrupt QDA. They won't replace the thinking analyst, but LLMs will quicky find patterns and themes and let analysts work more efficiently and focus on the parts that humans still do best
 
 ## ☕️ Coffee/tea break
+
+![](img/amt1.png)
+
+[tinyurl.com/avsiday1](https://tinyurl.com/avsiday1)
 
 ```{r}
 countdown(minutes = 15, seconds = 00)
@@ -315,6 +324,10 @@ countdown(minutes = 5, seconds = 00)
 ![](img/flcs_survey.png)
 
 ## ☕️ Coffee/tea break
+
+![](img/amt1.png)
+
+[tinyurl.com/avsiday1](https://tinyurl.com/avsiday1)
 
 ```{r}
 countdown(minutes = 15, seconds = 00)

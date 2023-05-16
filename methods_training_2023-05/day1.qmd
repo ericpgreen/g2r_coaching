@@ -487,18 +487,18 @@ IDEO, [*The Field Guide to Human-Centered Design*](https://www.designkit.org/res
 ::: {.column width="50%"}
 
 <center>
-Sign up for a [Posit Cloud Free account](https://posit.cloud/plans/free)
+Sign up for a [Posit Cloud Free account](https://ghr.link/g2r-cloud) and join our workspace
 <br>
 
 ![](img/posit.png)
 <br>
-ghr.link/pcf
+ghr.link/g2r-cloud
 </center>
 :::
 
 ::: {.column width="50%"}
 <center>
-Follow [these instructions](https://posit.co/download/rstudio-desktop/) to download/install R and RStudio
+Follow [these instructions](https://posit.co/download/rstudio-desktop/) to download/install R and RStudio (in that order)
 
 ![](img/rsd.png)
 <br>
